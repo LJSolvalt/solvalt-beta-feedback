@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Solvalt Insights — Beta Feedback</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme:dark;
+    --bg:#0B0E13; --surface:#12151C; --surface-2:#1A1E27; --surface-3:#22262F;
+    --ink:#E7EBEF; --ink-soft:#9AA6B2; --ink-faint:#707B8F;
+    --line:#272C37; --line-soft:#1D212A;
+    --brand:#1EB885; --brand-dark:#179C70; --brand-fg:#07120D; --brand-tint:rgba(30,184,133,.13);
+    --accent:#26ABE8;
+    --pass:#28BE6A; --pass-tint:rgba(40,190,106,.14);
+    --fail:#E94747; --fail-tint:rgba(233,71,71,.15);
+    --issue:#F9AB10; --issue-tint:rgba(249,171,16,.14);
+    --blocker:#E94747; --annoyance:#F9AB10; --suggestion:#1EB885;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 12px 32px rgba(0,0,0,.40);
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif; font-size:16px; line-height:1.5;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px}
+  h1,h2,h3,.display{font-family:'Inter',sans-serif;letter-spacing:-.015em;font-weight:700}
+
+  header.app{position:sticky;top:0;z-index:20;background:rgba(11,14,19,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .hbar{display:flex;align-items:center;gap:12px;height:58px}
+  .mark{font-weight:700;font-size:18px;letter-spacing:.01em;color:var(--ink);white-space:nowrap}
+  .mark b{color:var(--brand)}
+  .mark .sub{display:block;font-weight:600;font-size:10px;letter-spacing:.16em;color:var(--ink-faint);text-transform:uppercase;line-height:1;margin-top:2px}
+  .hspace{flex:1}
+  .rolepill{font-weight:600;font-size:13px;padding:5px 11px;border-radius:999px;background:var(--brand-tint);color:var(--brand);white-space:nowrap}
+
+  .rail{display:flex;gap:4px;padding:10px 0 12px}
+  .seg{height:6px;flex:1;border-radius:99px;background:var(--surface-3);transition:background .25s;cursor:pointer;border:none;padding:0;min-width:6px}
+  .seg.pass{background:var(--pass)} .seg.fail{background:var(--fail)} .seg.issue{background:var(--issue)}
+  .seg.current{outline:2px solid var(--brand);outline-offset:2px}
+  .railmeta{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);font-weight:500;margin-top:-4px;padding-bottom:8px}
+
+  main{padding:22px 0 110px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+  .pad{padding:22px}
+
+  .eyebrow{font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin:0 0 6px}
+  .steptitle{font-size:22px;font-weight:700;margin:0 0 18px;line-height:1.2}
+
+  .block{margin-bottom:16px}
+  .block .lab{font-weight:600;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 4px}
+  .block.context{background:var(--surface-2);border-left:3px solid var(--brand);border-radius:8px;padding:12px 14px;color:var(--ink-soft)}
+  .block .txt{margin:0;color:var(--ink)}
+
+  .qlab{font-weight:600;font-size:13px;color:var(--ink);margin:24px 0 10px}
+
+  .pfi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .pfi button{font-weight:600;font-size:15px;padding:16px 8px;border-radius:var(--radius);border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink-soft);cursor:pointer;transition:.12s;display:flex;flex-direction:column;align-items:center;gap:6px}
+  .pfi button .ic{font-size:20px;line-height:1}
+  .pfi button:hover{border-color:var(--ink-faint);color:var(--ink)}
+  .pfi button.sel-pass{background:var(--pass-tint);border-color:var(--pass);color:var(--pass)}
+  .pfi button.sel-fail{background:var(--fail-tint);border-color:var(--fail);color:var(--fail)}
+  .pfi button.sel-issue{background:var(--issue-tint);border-color:var(--issue);color:var(--issue)}
+
+  .sev{margin-top:16px}
+  .sevrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .sevrow button{font-weight:600;font-size:13px;padding:10px 6px;border-radius:var(--radius);border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink-soft);cursor:pointer}
+  .sevrow button:hover{border-color:var(--ink-faint);color:var(--ink)}
+  .sevrow button.on[data-sev="Blocker"]{background:var(--blocker);border-color:var(--blocker);color:#fff}
+  .sevrow button.on[data-sev="Annoyance"]{background:var(--annoyance);border-color:var(--annoyance);color:#1A1203}
+  .sevrow button.on[data-sev="Suggestion"]{background:var(--suggestion);border-color:var(--suggestion);color:var(--brand-fg)}
+
+  textarea,input[type=text],select{width:100%;font-family:'Inter';font-size:15px;color:var(--ink);background:var(--surface-2);border:1.5px solid var(--line);border-radius:var(--radius);padding:12px;resize:vertical}
+  select{resize:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239AA6B2' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+  textarea::placeholder,input::placeholder{color:var(--ink-faint)}
+  textarea:focus,input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-tint)}
+  textarea{min-height:84px}
+  .notes{margin-top:16px}
+
+  .nav{position:fixed;bottom:0;left:0;right:0;background:rgba(11,14,19,.92);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));z-index:20}
+  .navin{max-width:760px;margin:0 auto;display:flex;gap:12px;align-items:center}
+  .btn{font-weight:600;font-size:15px;border-radius:11px;padding:13px 22px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer;transition:.12s}
+  .btn:hover{border-color:var(--ink-faint)}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-fg)}
+  .btn.primary:hover{background:var(--brand-dark);border-color:var(--brand-dark)}
+  .btn.primary:disabled{background:var(--surface-3);border-color:var(--line);color:var(--ink-faint);cursor:not-allowed}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--ink-soft)}
+  .btn.ghost:hover{color:var(--ink)}
+  .btn.wide{flex:1;text-align:center}
+  .btn.lg{font-size:16px;padding:15px 24px}
+
+  .roles{display:grid;gap:14px;margin-top:18px}
+  .rolecard{display:flex;align-items:center;gap:16px;text-align:left;width:100%;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:18px;cursor:pointer;transition:.14s;color:var(--ink)}
+  .rolecard:hover{border-color:var(--brand);transform:translateY(-1px);box-shadow:var(--shadow)}
+  .rolecard .num{font-weight:700;font-size:15px;color:var(--brand);background:var(--brand-tint);width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .rolecard h3{margin:0 0 2px;font-size:17px}
+  .rolecard p{margin:0;font-size:13px;color:var(--ink-soft)}
+  .rolecard .arrow{margin-left:auto;color:var(--ink-faint);font-size:20px}
+  .rolecard.optional{border-style:dashed}
+
+  .lead{font-size:15px;color:var(--ink-soft);margin:0 0 4px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-weight:600;font-size:13px;margin-bottom:6px}
+
+  .sumrow{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid var(--line-soft)}
+  .sumrow:last-child{border-bottom:none}
+  .tag{font-weight:600;font-size:11px;letter-spacing:.04em;padding:3px 8px;border-radius:6px;flex-shrink:0;text-transform:uppercase}
+  .tag.pass{background:var(--pass-tint);color:var(--pass)}
+  .tag.fail{background:var(--fail-tint);color:var(--fail)}
+  .tag.issue{background:var(--issue-tint);color:var(--issue)}
+  .tag.none{background:var(--surface-3);color:var(--ink-faint)}
+  .sumrow .body{flex:1;min-width:0}
+  .sumrow .body .t{font-weight:600;font-size:14px}
+  .sumrow .body .n{font-size:13px;color:var(--ink-soft);margin-top:3px;white-space:pre-wrap}
+  .sevchip{font-size:11px;font-weight:600;padding:1px 7px;border-radius:5px;margin-left:6px}
+  .sevchip[data-sev=Blocker]{background:var(--fail-tint);color:var(--fail)}
+  .sevchip[data-sev=Annoyance]{background:var(--issue-tint);color:var(--issue)}
+  .sevchip[data-sev=Suggestion]{background:var(--brand-tint);color:var(--brand)}
+  .editlink{font-size:12px;color:var(--brand);font-weight:600;cursor:pointer;background:none;border:none;padding:0;margin-top:4px}
+
+  .counts{display:flex;gap:10px;margin:4px 0 20px;flex-wrap:wrap}
+  .count{font-weight:600;font-size:13px;padding:7px 13px;border-radius:99px;border:1.5px solid var(--line)}
+  .count.pass{color:var(--pass);border-color:var(--pass);background:var(--pass-tint)}
+  .count.fail{color:var(--fail);border-color:var(--fail);background:var(--fail-tint)}
+  .count.issue{color:var(--issue);border-color:var(--issue);background:var(--issue-tint)}
+
+  .done-ic{width:64px;height:64px;border-radius:50%;background:var(--pass-tint);color:var(--pass);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 18px}
+  .center{text-align:center}
+  .muted{color:var(--ink-soft);font-size:14px}
+  .hint{font-size:13px;color:var(--ink-faint);margin-top:8px}
+  .banner{background:var(--issue-tint);border:1px solid var(--issue);color:var(--issue);border-radius:var(--radius);padding:12px 14px;font-size:13px;margin-bottom:16px}
+  .resume{background:var(--brand-tint);border:1px solid var(--brand);border-radius:var(--radius);padding:14px;margin-bottom:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .resume .t{font-weight:600;font-size:14px;color:var(--brand)}
+
+  .coordhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .aggrow{padding:14px 0;border-bottom:1px solid var(--line-soft)}
+  .aggrow:last-child{border-bottom:none}
+  .aggtitle{font-weight:600;font-size:14px;margin-bottom:8px}
+  .bar{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--surface-3);font-size:11px;font-weight:600;color:#fff}
+  .bar span{display:flex;align-items:center;justify-content:center;min-width:0}
+  .bar .b-pass{background:var(--pass)} .bar .b-fail{background:var(--fail)} .bar .b-issue{background:var(--issue);color:#1A1203}
+  .issuelist{margin-top:8px;font-size:13px}
+  .issuelist .il{padding:6px 0;border-top:1px dashed var(--line)}
+  .dz{border:2px dashed var(--line);border-radius:12px;padding:26px;text-align:center;color:var(--ink-soft);cursor:pointer;transition:.14s}
+  .dz:hover,.dz.over{border-color:var(--brand);background:var(--brand-tint)}
+
+  @media (max-width:520px){
+    .steptitle{font-size:19px}
+    .pad{padding:18px}
+    .pfi button{font-size:13px;padding:14px 4px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="app"><div class="wrap"><div class="hbar">
+  <div class="mark">SOL<b>VALT</b><span class="sub">Insights · Beta Feedback</span></div>
+  <div class="hspace"></div>
+  <div id="rolepill"></div>
+</div><div id="railzone"></div></div></header>
+
+<main><div class="wrap" id="root"></div></main>
+<div class="nav" id="navbar" style="display:none"><div class="navin" id="navin"></div></div>
+
+<script>
+"use strict";
+/* ============================================================
+   CONFIG
+   ============================================================ */
+// When the Functions endpoint is live, set this to the API base, e.g.
+// "https://solvalt-insights-api-exbgenasc7h0hsbq.eastus-01.azurewebsites.net/api"
+const API_BASE = "https://solvalt-insights-api-exbgenasc7h0hsbq.eastus-01.azurewebsites.net/api";
+const ALERT_TO = "admin@solvaltinc.com";
+const APP_VERSION = "v0.9-beta";
+
+/* ============================================================
+   BETA ACCOUNTS
+   ============================================================ */
+const BETA_ACCOUNTS = [
+  {
+    id:"cust_tampa_001", company:"Suncoast Portable Solutions", city:"Tampa, FL", prefix:"TB",
+    units:Array.from({length:25},(_,i)=>`TB-${String(i+1).padStart(3,"0")}`)
+  },
+  {
+    id:"cust_columbia_beta_001", company:"Midlands Sanitation Services", city:"Columbia, SC", prefix:"MS",
+    units:Array.from({length:25},(_,i)=>`MS-${String(i+1).padStart(3,"0")}`)
+  },
+  {
+    id:"cust_blythewood_001", company:"Blythewood Sanitation Co.", city:"Blythewood, SC", prefix:"BW",
+    units:Array.from({length:25},(_,i)=>`BW-${String(i+1).padStart(3,"0")}`)
+  },
+  {
+    id:"cust_charleston_001", company:"Lowcountry Portable Services", city:"Charleston, SC", prefix:"LC",
+    units:Array.from({length:25},(_,i)=>`LC-${String(i+1).padStart(3,"0")}`)
+  }
+];
+
+// Inject account-specific unit IDs into scenario text
+function resolveScenario(sc, account){
+  if(!account||!sc.action) return sc;
+  const u=account.units;
+  const r=t=>t.replace(/\{\{unit1\}\}/g,u[0]).replace(/\{\{unit2\}\}/g,u[1]).replace(/\{\{unit3\}\}/g,u[2]).replace(/\{\{unit_offroute\}\}/g,u[20]);
+  return {...sc, action:r(sc.action), context:r(sc.context||""), expected:r(sc.expected||"")};
+}
+
+/* ============================================================
+   SCENARIO CONTENT
+   ============================================================ */
+const TRACKS = {
+  admin: {
+    label: "Admin", icon: "1",
+    blurb: "Owner / company administrator — full access to clients, billing, users and settings.",
+    scenarios: [
+      {id:"a1", title:"First login & setup",
+        context:"It's your first time logging in as the company administrator.",
+        action:"Log in with your admin credentials. Navigate to the Dashboard and review the fleet status cards, the savings widget, and any units marked as needing service.",
+        expected:"The Dashboard loads with stat cards, fleet status, and a savings figure. Nothing looks broken or empty."},
+      {id:"a2", title:"Client management & unit assignment",
+        context:"A new customer signed a contract and you need to set them up, then reassign a unit from one client to another.",
+        action:"1. Go to Clients (left nav). Click '+ New Client', fill in name, address, and contact info, then save.\n2. Open an existing client and assign 2–3 units to them using the unit assignment panel.\n3. Now pick one of those units and reassign it to a different client: open that unit from the Units page, click the client assignment field, select a different client, and save.\n4. Finally, archive a client you no longer need by opening their record and clicking Archive.",
+        expected:"New client appears in the list. Units show under the correct client after each assignment. The reassigned unit moves cleanly. Archived client drops off the active list."},
+      {id:"a3", title:"Route planning",
+        context:"You want a reusable route for an area you service regularly.",
+        action:"Go to Routes (left nav) → Saved Routes tab. Click '+ New Route Template', give it a name, select units by zone, set a default driver, then save.",
+        expected:"The route saves and shows up in Saved Routes with the units you selected."},
+      {id:"a4", title:"Scheduling & dispatch",
+        context:"Time to put a crew on the road today.",
+        action:"Go to Schedule (left nav). Click '+ New Schedule', choose today's date, select the route template you just created, assign it to your driver, then click Dispatch.",
+        expected:"The route shows as Dispatched. The driver you assigned will see it on their end — you'll verify this in the Driver track next."},
+      {id:"a_pause", title:"⏸ Switch to Driver now",
+        context:"The next Admin scenarios require live stop data from a driver actively working the route you just dispatched.",
+        action:"Save your progress here, then switch to the Driver track and complete all Driver scenarios (D1–D9). The driver will complete stops on the route you just dispatched. Once finished, come back to Admin and continue from Scenario 5.",
+        expected:"After finishing the Driver track, return here and tap Next to continue with live monitoring.",
+        isPause:true},
+      {id:"a5", title:"Live monitoring",
+        context:"Your driver is out working the route you dispatched.",
+        action:"Go to Schedule (left nav). Find today's dispatched route and watch the stop progress indicators update as the driver completes stops.",
+        expected:"Stop progress updates automatically — you should not need to refresh the page."},
+      {id:"a6", title:"Recall a route",
+        context:"Plans changed and you need to pull a route back in.",
+        action:"On the Schedule page, find the active dispatched route and click Recall. Confirm the recall. Then re-dispatch it to the same driver.",
+        expected:"After recall the driver can no longer see the route. After re-dispatch it returns to them immediately."},
+      {id:"a7", title:"Billing — create an invoice",
+        context:"It's the end of the month and time to bill a client.",
+        action:"1. Go to Billing (left nav). Click '+ New Invoice'.\n2. Select a client from the dropdown, set the billing period (start and end date), then click Generate.\n3. Review the line items — they should reflect the units assigned to that client.\n4. Change the invoice status using the status dropdown (e.g. Draft → Sent).",
+        expected:"The invoice generates with correct line items for the selected client and date range. The status change saves and is reflected in the invoice list."},
+      {id:"a8", title:"User management",
+        context:"You're bringing on an office dispatcher and need to create their account.",
+        action:"Go to Users (left nav). Click '+ Invite User', enter a real email address you have access to, select the Operator role, and send the invite. Note: the system will send an actual email to that address — use your own email or a test address you can check.",
+        expected:"The user is created and appears in the Users list. An invitation email arrives at the address you entered."},
+      {id:"a9", title:"QR code management",
+        context:"You're running low on QR cards for new units.",
+        action:"1. Go to Admin (left nav) → QR Codes.\n2. Review the pool — note how many codes are available vs. reserved vs. used.\n3. Click 'Order QR Pack', choose a quantity, and submit the order.\n4. Check that the order appears in the fulfillment queue.",
+        expected:"The pool shows current code status clearly. The order is placed and appears in the queue with a pending status."},
+      {id:"a10", title:"Settings & savings configuration",
+        context:"Your real cost numbers are different from the defaults.",
+        action:"1. Go to Settings (left nav, bottom). Scroll to the Savings Configuration section.\n2. Update one or more values — cost per mile, cost per stop, baseline miles per unit, or service fill threshold.\n3. Click Save, then navigate back to the Dashboard and check the savings widget.",
+        expected:"The savings figure on the Dashboard changes to reflect your updated constants."}
+    ]
+  },
+  driver: {
+    label: "Driver", icon: "2",
+    blurb: "Field driver on a phone — today's route, scanning units, and completing stops.",
+    scenarios: [
+      {id:"d1", title:"First login (mobile)",
+        context:"It's your first time using the app on your phone for work.",
+        action:"Open the app URL on your phone and log in with your driver credentials. Look over the layout and find today's schedule.",
+        expected:"The app fits your phone screen and today's schedule is easy to find."},
+      {id:"d2", title:"View today's routes",
+        context:"You're checking your work for the day. Note: the Admin tester dispatched a route to you in their scenario A4 — you should see it here.",
+        action:"Go to the Routes tab and confirm your assigned route shows with the correct stops and a READY status.",
+        expected:"Your route appears with the correct stops and a READY badge."},
+      {id:"d3", title:"Execute a stop by scanning",
+        context:"You've pulled up to a unit on your route.",
+        action:"Tap a stop on your route list. When prompted to scan, type in unit ID {{unit1}} instead of scanning (the app accepts manual entry). Submit the service action and watch the stop complete.",
+        expected:"The service logs and the stop auto-completes on your route."},
+      {id:"d4", title:"Mark complete without scanning",
+        context:"The QR sticker on unit {{unit2}} is damaged and won't scan.",
+        action:"Open the stop for unit {{unit2}} on your route. Instead of scanning or typing an ID, tap 'Mark complete without scanning'.",
+        expected:"The stop moves to completed and shows up in your recent activity."},
+      {id:"d5", title:"A two-route day",
+        context:"You've been given two routes today.",
+        action:"Switch between the route tabs and check that the right stops show under each one.",
+        expected:"Each tab shows its own correct set of stops."},
+      {id:"d6", title:"Route map",
+        context:"You want directions in the right order.",
+        action:"Tap the Map button on a route, check the numbered markers are in stop order, and tap a marker to jump to its scan.",
+        expected:"Markers are numbered in stop order and tapping one opens that stop's scan."},
+      {id:"d7", title:"Driver map",
+        context:"You want the full picture of what's around you.",
+        action:"Open the Map tab, confirm your route stops are highlighted, then toggle to the all-units view.",
+        expected:"Your route stops are highlighted, and the toggle shows all units."},
+      {id:"d8", title:"Finish a full route",
+        context:"You're on the last stop of the day.",
+        action:"Complete every remaining stop on your route.",
+        expected:"A 'Route complete!' confirmation screen appears."},
+      {id:"d9", title:"Driver schedule",
+        context:"You want a quick status read.",
+        action:"Open the Schedule tab and check the status badges on your routes.",
+        expected:"Routes show READY / IN PROGRESS / COMPLETE correctly."}
+    ]
+  },
+  operator: {
+    label: "Operator / Dispatcher", icon: "3",
+    blurb: "Office dispatcher — daily operations, routes, and the map. No billing or settings.",
+    scenarios: [
+      {id:"o1", title:"Morning check-in",
+        context:"You're starting your shift and reviewing what needs service today.",
+        action:"Log in as operator and go to the Dashboard. In the Fleet Deployment section, check the color status of units — green (ok), amber (needs service soon), red (needs service now). Note how many units are in each state and look at the 'Units Needing Service' section.",
+        expected:"The Dashboard clearly shows unit status by color and the Needs Service section lists the right units."},
+      {id:"o2", title:"Route optimization",
+        context:"You'd like the system to suggest an efficient route based on current fill levels.",
+        action:"Go to Routes (left nav). Review the suggested stops ordered by fill level. Select the units you want to service and save them as a new route template.",
+        expected:"Suggested stops appear ordered by fill level, and the template saves."},
+      {id:"o3", title:"Schedule & dispatch",
+        context:"Your crew is ready to roll.",
+        action:"Go to Schedule (left nav). Click '+ New Schedule', select the route template you just created, assign a driver, and click Dispatch.",
+        expected:"The schedule is created and pushed. The driver receives it on their end."},
+      {id:"o4", title:"Monitor active routes",
+        context:"A driver is out working.",
+        action:"Stay on the Schedule page and watch the live stop progress as stops get completed by the driver.",
+        expected:"Progress updates live as each stop is completed — no refresh needed."},
+      {id:"o5", title:"Map monitoring",
+        context:"You want a visual read on the field.",
+        action:"Go to Map (left nav). Check unit locations and review status coloring across the zones.",
+        expected:"The map shows units in the right locations with correct status colors."},
+      {id:"o6", title:"Fleet status & needs service check",
+        context:"You want to confirm the system is surfacing the right service priorities.",
+        action:"Return to the Dashboard. In the Fleet Deployment section, confirm the color coding is accurate — units that should need service are showing amber or red. Check the 'Units Needing Service' list and make sure the right units appear there.",
+        expected:"Color status accurately reflects each unit's service state. The Needs Service list matches what you'd expect based on the fleet data."},
+      {id:"o7", title:"Recall & reassign",
+        context:"A driver just called out sick mid-day.",
+        action:"On the Schedule page, find the active route and click Recall. Edit the driver assignment, then re-dispatch to a different driver.",
+        expected:"The recall works, the driver change saves, and the new driver receives the route."},
+      {id:"o8", title:"Client context & unit assignment",
+        context:"You need to check which units belong to which client, then move a unit.",
+        action:"Go to Clients (left nav). Review the unit lists under each client. Then open the Units page, pick a unit, and reassign it to a different client using the client assignment field.",
+        expected:"Each client clearly shows their assigned units. The reassigned unit moves to the new client immediately."}
+    ]
+  },
+  edge: {
+    label: "Edge Cases & Stress Tests", icon: "!",
+    optional:true,
+    blurb: "Optional — the messy real-world situations. Best run after completing all role tracks.",
+    scenarios: [
+      {id:"e1", title:"Location turned off",
+        context:"Your phone's location is switched off.",
+        action:"In your phone settings, turn off location for the browser or the app. Then open the app and try to scan or complete a stop.",
+        expected:"The app handles it gracefully — a clear message appears, no crash."},
+      {id:"e2", title:"QR scan then manual entry",
+        context:"You want to test both the camera scan and the manual entry fallback.",
+        action:"1. First: tap a stop and use your phone camera to scan the QR code on a physical unit card (your setup email includes a QR sheet).\n2. Submit the action and confirm it logs.\n3. Next: on a different stop, skip the camera and manually type unit ID {{unit3}}.\n4. Submit and confirm that logs too.",
+        expected:"Both methods — camera scan and manual entry — log the service action correctly."},
+      {id:"e3", title:"Unit not on your route",
+        context:"You end up servicing a unit that wasn't on today's list.",
+        action:"Go to the scan page and manually enter unit ID {{unit_offroute}} — this unit is not on today's route. Submit a service action.",
+        expected:"The action logs correctly but your route progress does not change."},
+      {id:"e4", title:"Recall while you're working",
+        context:"The office pulls your route while you're mid-execution.",
+        action:"While on the Driver track, have the Admin tester recall your active route. Then refresh the app on your phone.",
+        expected:"You see a clear message explaining the route was recalled — the app does not crash or show an error."},
+      {id:"e5", title:"Double-tap completion",
+        context:"You tap complete twice by accident.",
+        action:"On a stop you've already completed, try to mark it complete a second time.",
+        expected:"No duplicate entry gets logged — the stop stays completed with a single record."}
+    ]
+  }
+};
+
+const IMPRESSION_QS = [
+  {id:"confused", q:"What confused you, if anything?"},
+  {id:"natural", q:"What felt natural or easy?"},
+  {id:"missing", q:"What seemed to be missing?"},
+];
+
+/* ============================================================
+   STATE + PERSISTENCE
+   ============================================================ */
+let S = null;
+const slug = s => (s||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const keyFor = (name,role) => `solvalt_beta::${slug(name)}::${role}`;
+const PROFILE_KEY = "solvalt_beta_profile";
+
+function blankSession(name,email,company,role,accountId){
+  return {v:APP_VERSION, name, email, company, role, accountId:accountId||"", stepIndex:0, results:{},
+          impressions:null, impressionsDone:false, submittedAt:null, startedAt:new Date().toISOString()};
+}
+function getAccount(id){ return BETA_ACCOUNTS.find(a=>a.id===id)||null; }
+function save(){ if(S&&S.role){ try{localStorage.setItem(keyFor(S.name,S.role),JSON.stringify(S));}catch(e){} } }
+function loadSession(name,role){ try{const r=localStorage.getItem(keyFor(name,role));return r?JSON.parse(r):null;}catch(e){return null;} }
+function saveProfile(name,email,company,accountId){ try{localStorage.setItem(PROFILE_KEY,JSON.stringify({name,email,company,accountId:accountId||""}));}catch(e){} }
+function loadProfile(){ try{const r=localStorage.getItem(PROFILE_KEY);return r?JSON.parse(r):null;}catch(e){return null;} }
+function listLocalSubmissions(){
+  const out=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k.startsWith("solvalt_beta::")){
+      try{const v=JSON.parse(localStorage.getItem(k)); if(v&&v.submittedAt) out.push(v);}catch(e){}
+    }
+  }
+  return out;
+}
+
+/* ============================================================
+   VIEW STATE
+   ============================================================ */
+let VIEW = "welcome"; // welcome | account | role | step | impressions | summary | done | coordinator
+let EDIT_FROM_SUMMARY = false;
+let SUBMIT_STATE = null; // null | 'sending' | 'sent' | 'offline'
+const root = document.getElementById("root");
+const railzone = document.getElementById("railzone");
+const rolepill = document.getElementById("rolepill");
+const navbar = document.getElementById("navbar");
+const navin = document.getElementById("navin");
+
+const esc = s => (s==null?"":String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function track(){ return TRACKS[S.role]; }
+function scenarios(){ return track().scenarios; }
+function curScenario(){ return scenarios()[S.stepIndex]; }
+
+if(new URLSearchParams(location.search).get("view")==="coordinator"){ VIEW="coordinator"; }
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render(){
+  // header bits
+  if(S&&S.role&&(VIEW==="step"||VIEW==="impressions"||VIEW==="summary")){
+    rolepill.innerHTML=`<div class="rolepill">${esc(track().label)}</div>`;
+    renderRail();
+  } else {
+    rolepill.innerHTML=""; railzone.innerHTML="";
+  }
+  if(VIEW==="welcome") return renderWelcome();
+  if(VIEW==="account") return renderAccount();
+  if(VIEW==="role") return renderRole();
+  if(VIEW==="step") return renderStep();
+  if(VIEW==="impressions") return renderImpressions();
+  if(VIEW==="summary") return renderSummary();
+  if(VIEW==="done") return renderDone();
+  if(VIEW==="coordinator") return renderCoordinator();
+}
+
+function renderRail(){
+  const sc=scenarios();
+  const segs=sc.map((s,i)=>{
+    if(s.isPause) return `<div class="seg" style="background:var(--brand);opacity:.35;cursor:default" title="Pause point"></div>`;
+    const r=S.results[s.id]; const cls=r?r.status:"";
+    const cur=(VIEW==="step"&&i===S.stepIndex)?" current":"";
+    return `<button class="seg ${cls}${cur}" data-jump="${i}" title="${esc(s.title)}"></button>`;
+  }).join("");
+  const realSc=sc.filter(s=>!s.isPause);
+  const done=realSc.filter(s=>S.results[s.id]).length;
+  railzone.innerHTML=`<div class="rail">${segs}</div>
+    <div class="railmeta"><span>${done} of ${realSc.length} scenarios answered</span>
+    <span>${track().label}</span></div>`;
+}
+
+function setNav(html){ if(!html){navbar.style.display="none";navin.innerHTML="";} else {navbar.style.display="block";navin.innerHTML=html;} }
+
+/* ---------- Welcome ---------- */
+function renderWelcome(){
+  const p=loadProfile()||{name:"",email:"",company:""};
+  root.innerHTML=`
+   <div class="card pad" style="margin-top:8px">
+     <p class="eyebrow">Beta Program</p>
+     <h1 style="font-size:26px;margin:0 0 10px;line-height:1.15">Thanks for testing Solvalt Insights.</h1>
+     <p class="lead">You'll walk through a set of real-world scenarios for your role and tell us how each one went — Pass, Fail, or flag an Issue. It takes about 20–30 minutes, and your progress is saved as you go, so you can stop and come back.</p>
+     <div style="height:8px"></div>
+     <div class="field">
+       <label for="nm">Your name <span style="color:var(--fail)">*</span></label>
+       <input type="text" id="nm" value="${esc(p.name)}" placeholder="e.g. Sandra Briggs" autocomplete="name">
+       <div class="err-msg" id="nm-err" style="display:none;color:var(--fail);font-size:12px;margin-top:4px">Please enter your name.</div>
+     </div>
+     <div class="field">
+       <label for="em">Email address <span style="color:var(--fail)">*</span></label>
+       <input type="text" id="em" value="${esc(p.email||"")}" placeholder="e.g. sandra@company.com" autocomplete="email" inputmode="email">
+       <div class="err-msg" id="em-err" style="display:none;color:var(--fail);font-size:12px;margin-top:4px">Please enter a valid email address.</div>
+     </div>
+     <div class="field">
+       <label for="co">Company <span style="color:var(--ink-faint);font-weight:400">(optional)</span></label>
+       <input type="text" id="co" value="${esc(p.company)}" placeholder="e.g. Palmetto Portables" autocomplete="organization">
+     </div>
+   </div>`;
+  setNav(`<button class="btn primary wide lg" id="go">Continue</button>`);
+  const nm=document.getElementById("nm"), em=document.getElementById("em"), co=document.getElementById("co");
+  const emailRe=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  function validate(){
+    let ok=true;
+    const nmErr=document.getElementById("nm-err"), emErr=document.getElementById("em-err");
+    if(!nm.value.trim()){nm.style.borderColor="var(--fail)";nmErr.style.display="block";ok=false;}
+    else{nm.style.borderColor="";nmErr.style.display="none";}
+    if(!emailRe.test(em.value.trim())){em.style.borderColor="var(--fail)";emErr.style.display="block";ok=false;}
+    else{em.style.borderColor="";emErr.style.display="none";}
+    return ok;
+  }
+  nm.addEventListener("input",()=>{if(nm.style.borderColor){nm.style.borderColor="";document.getElementById("nm-err").style.display="none";}});
+  em.addEventListener("input",()=>{if(em.style.borderColor){em.style.borderColor="";document.getElementById("em-err").style.display="none";}});
+  document.getElementById("go").onclick=()=>{
+    if(!validate()) return;
+    const name=nm.value.trim(), email=em.value.trim(), company=co.value.trim();
+    saveProfile(name,email,company);
+    window._pending={name,email,company,accountId:(loadProfile()||{}).accountId||""};
+    VIEW="account"; render();
+  };
+}
+
+/* ---------- Account select ---------- */
+function renderAccount(){
+  const p=window._pending||loadProfile()||{};
+  const {name,email,company}=p;
+  const selId=p.accountId||"";
+  const opts=BETA_ACCOUNTS.map(a=>`<option value="${a.id}" ${a.id===selId?"selected":""}>${a.company} — ${a.city}</option>`).join("");
+  const acct=BETA_ACCOUNTS.find(a=>a.id===selId)||null;
+  const credCard=acct?`
+    <div style="margin-top:18px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:16px">
+      <p style="font-weight:700;font-size:13px;color:var(--brand);margin:0 0 10px">🔑 Your login credentials</p>
+      <p style="font-size:13px;color:var(--ink-soft);margin:0 0 8px">Your setup email contains the username and password for each role below. Use the correct one when testing each track.</p>
+      <div style="display:grid;gap:8px">
+        ${["Admin","Operator","Driver"].map(r=>`
+          <div style="background:var(--surface-3);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">
+            <span style="font-weight:700;font-size:12px;color:var(--brand);background:var(--brand-tint);padding:3px 8px;border-radius:6px;white-space:nowrap">${r}</span>
+            <span style="font-size:13px;color:var(--ink-soft)">See your setup email for ${r.toLowerCase()} credentials</span>
+          </div>`).join("")}
+      </div>
+      <div style="margin-top:12px;background:var(--surface-3);border-radius:8px;padding:10px 12px">
+        <p style="font-size:12px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px">Unit IDs for your account</p>
+        <p style="font-size:13px;color:var(--ink);margin:0;font-family:monospace;letter-spacing:.04em">${acct.units.slice(0,5).join("  ")}  <span style="color:var(--ink-faint)">… through ${acct.units[acct.units.length-1]}</span></p>
+        <p style="font-size:12px;color:var(--ink-soft);margin:6px 0 0">These IDs will be referenced in the scanning scenarios. Use them when prompted to enter a unit ID manually.</p>
+      </div>
+    </div>`:"";
+  root.innerHTML=`
+    <div style="margin-top:8px">
+      <div class="card pad">
+        <p class="eyebrow">Your test account</p>
+        <h1 style="font-size:23px;margin:0 0 10px">Which company are you testing?</h1>
+        <p class="lead" style="margin-bottom:16px">Select the beta account assigned to you. This sets your login credentials and unit IDs for the scanning scenarios.</p>
+        <div class="field" style="margin-bottom:0">
+          <label for="acct-sel">Assigned company <span style="color:var(--fail)">*</span></label>
+          <select id="acct-sel" style="width:100%;font-family:Inter;font-size:15px;color:var(--ink);background:var(--surface-2);border:1.5px solid var(--line);border-radius:10px;padding:12px;appearance:none;-webkit-appearance:none;cursor:pointer">
+            <option value="">— select your company —</option>
+            ${opts}
+          </select>
+        </div>
+        <div id="cred-card">${credCard}</div>
+      </div>
+    </div>`;
+  setNav(`<button class="btn ghost" id="back">← Back</button>
+          <button class="btn primary wide" id="next">Continue →</button>`);
+  document.getElementById("back").onclick=()=>{VIEW="welcome";render();};
+  const sel=document.getElementById("acct-sel");
+  sel.onchange=()=>{
+    const a=BETA_ACCOUNTS.find(x=>x.id===sel.value)||null;
+    window._pending={...window._pending,accountId:sel.value};
+    saveProfile(window._pending.name,window._pending.email,window._pending.company,sel.value);
+    document.getElementById("cred-card").innerHTML=a?`
+      <div style="margin-top:18px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:16px">
+        <p style="font-weight:700;font-size:13px;color:var(--brand);margin:0 0 10px">🔑 Your login credentials</p>
+        <p style="font-size:13px;color:var(--ink-soft);margin:0 0 8px">Your setup email contains the username and password for each role below. Use the correct one when testing each track.</p>
+        <div style="display:grid;gap:8px">
+          ${["Admin","Operator","Driver"].map(r=>`
+            <div style="background:var(--surface-3);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">
+              <span style="font-weight:700;font-size:12px;color:var(--brand);background:var(--brand-tint);padding:3px 8px;border-radius:6px;white-space:nowrap">${r}</span>
+              <span style="font-size:13px;color:var(--ink-soft)">See your setup email for ${r.toLowerCase()} credentials</span>
+            </div>`).join("")}
+        </div>
+        <div style="margin-top:12px;background:var(--surface-3);border-radius:8px;padding:10px 12px">
+          <p style="font-size:12px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px">Unit IDs for your account</p>
+          <p style="font-size:13px;color:var(--ink);margin:0;font-family:monospace;letter-spacing:.04em">${a.units.slice(0,5).join("  ")}  <span style="color:var(--ink-faint)">… through ${a.units[a.units.length-1]}</span></p>
+          <p style="font-size:12px;color:var(--ink-soft);margin:6px 0 0">These IDs will be referenced in the scanning scenarios. Use them when prompted to enter a unit ID manually.</p>
+        </div>
+      </div>`:"";
+  };
+  document.getElementById("next").onclick=()=>{
+    if(!sel.value){sel.style.borderColor="var(--fail)";return;}
+    sel.style.borderColor="";
+    window._pending={...window._pending,accountId:sel.value};
+    saveProfile(window._pending.name,window._pending.email,window._pending.company,sel.value);
+    VIEW="role"; render(); window.scrollTo(0,0);
+  };
+}
+
+/* ---------- Role select ---------- */
+function renderRole(){
+  const {name,email,company,accountId}=window._pending||loadProfile()||{name:"",email:"",company:"",accountId:""};
+  const acct=BETA_ACCOUNTS.find(a=>a.id===accountId)||null;
+  const cards=Object.entries(TRACKS).map(([k,t])=>{
+    const existing=loadSession(name,k);
+    let badge="";
+    if(existing){
+      if(existing.submittedAt) badge=`<p style="color:var(--pass);font-weight:600;font-size:12px;margin-top:4px">✓ Submitted — reopen to review</p>`;
+      else {const answered=Object.keys(existing.results||{}).length;
+            badge=`<p style="color:var(--brand);font-weight:600;font-size:12px;margin-top:4px">In progress — ${answered}/${t.scenarios.length} answered</p>`;}
+    }
+    return `<button class="rolecard ${t.optional?'optional':''}" data-role="${k}">
+      <div class="num">${esc(t.icon)}</div>
+      <div><h3>${esc(t.label)}</h3><p>${esc(t.blurb)}</p>${badge}</div>
+      <div class="arrow">→</div></button>`;
+  }).join("");
+  root.innerHTML=`
+    <div style="margin-top:6px">
+      <p class="eyebrow">Choose your track</p>
+      <h1 style="font-size:23px;margin:0 0 10px">Hi ${esc(name.split(" ")[0]||"there")} — which role are you testing?</h1>
+      <div style="background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--brand);border-radius:10px;padding:14px 16px;margin-bottom:20px">
+        <p style="font-weight:700;font-size:13px;margin:0 0 8px;color:var(--brand)">📋 Suggested testing order</p>
+        <p style="font-size:13px;color:var(--ink-soft);margin:0;line-height:1.6">
+          Some scenarios require live data from the Driver. Follow this sequence:<br>
+          <span style="color:var(--ink);font-weight:600">1.</span> Admin — scenarios 1–4 (setup &amp; dispatch)<br>
+          <span style="color:var(--ink);font-weight:600">2.</span> Driver — all scenarios (completes stops on the route Admin dispatched)<br>
+          <span style="color:var(--ink);font-weight:600">3.</span> Admin — scenarios 5–10 (live monitoring &amp; the rest)<br>
+          <span style="color:var(--ink);font-weight:600">4.</span> Operator / Dispatcher<br>
+          <span style="color:var(--ink-faint);font-weight:500">5.</span> <span style="color:var(--ink-faint)">Edge Cases (optional — run last)</span>
+        </p>
+      </div>
+      <div class="roles">${cards}</div>
+    </div>`;
+  setNav(`<button class="btn ghost" id="back">← Back</button>`);
+  document.getElementById("back").onclick=()=>{VIEW="account";render();};
+  document.querySelectorAll(".rolecard").forEach(b=>b.onclick=()=>{
+    const role=b.dataset.role;
+    const existing=loadSession(name,role);
+    S = existing || blankSession(name,email,company,role,accountId);
+    S.name=name; S.email=email||S.email||""; S.company=company; S.accountId=accountId||S.accountId||"";
+    if(S.submittedAt){ SUBMIT_STATE="sent"; VIEW="summary"; }
+    else { VIEW="step"; }
+    save(); render(); window.scrollTo(0,0);
+  });
+}
+
+/* ---------- Step ---------- */
+function renderStep(){
+  const rawSc=curScenario();
+  const acct=S&&S.accountId?BETA_ACCOUNTS.find(a=>a.id===S.accountId)||null:null;
+  const sc=resolveScenario(rawSc,acct);
+
+  // Special pause card — no Pass/Fail/Issue, just a directional screen
+  if(sc.isPause){
+    root.innerHTML=`
+      <div class="card pad" style="border-color:var(--brand);border-width:2px">
+        <p class="eyebrow">Pause point</p>
+        <h2 class="steptitle" style="margin-bottom:12px">${esc(sc.title)}</h2>
+        <div class="block context" style="border-left-color:var(--issue);font-style:normal">
+          <p class="lab" style="color:var(--issue)">Why you're pausing</p>
+          <p class="txt">${esc(sc.context)}</p>
+        </div>
+        <div class="block"><p class="lab">What to do</p><p class="txt">${esc(sc.action)}</p></div>
+        <div class="block"><p class="lab">When to return</p><p class="txt">${esc(sc.expected)}</p></div>
+        <div style="background:var(--brand-tint);border-radius:10px;padding:14px;margin-top:8px;font-size:13px;color:var(--brand)">
+          <b>Your Admin progress is saved.</b> After completing the Driver track, come back, pick Admin from the role screen, and it will resume right here.
+        </div>
+      </div>`;
+    const isFirst=S.stepIndex===0;
+    setNav(`<button class="btn ghost" id="back">${isFirst?"← Change role":"← Previous"}</button>
+            <button class="btn primary wide" id="next">Go to Driver track →</button>`);
+    document.getElementById("back").onclick=()=>{
+      if(isFirst){VIEW="role";render();}
+      else{S.stepIndex--;save();renderStep();}
+      window.scrollTo(0,0);
+    };
+    document.getElementById("next").onclick=()=>{
+      // advance past pause so when they return they land on A5
+      S.stepIndex++; save();
+      window._pending={name:S.name,email:S.email,company:S.company,accountId:S.accountId||""};
+      VIEW="role"; render(); window.scrollTo(0,0);
+    };
+    return;
+  }
+
+  const r=S.results[sc.id]||{status:null,severity:null,notes:""};
+  const sevHtml = r.status==="issue" ? `
+    <div class="sev">
+      <div class="qlab" style="margin-top:6px">How severe is it?</div>
+      <div class="sevrow">
+        ${["Blocker","Annoyance","Suggestion"].map(s=>`<button data-sev="${s}" class="${r.severity===s?'on':''}">${s}</button>`).join("")}
+      </div>
+    </div>` : "";
+
+  // Step number excludes the pause marker
+  const allSc=scenarios(); const realSteps=allSc.filter(s=>!s.isPause);
+  const realIdx=realSteps.findIndex(s=>s.id===sc.id);
+  const stepLabel=realIdx>=0?`Scenario ${realIdx+1} of ${realSteps.length}`:`Scenario`;
+
+  root.innerHTML=`
+    <div class="card pad">
+      <p class="eyebrow">${stepLabel}</p>
+      <h2 class="steptitle">${esc(sc.title)}</h2>
+      <div class="block context"><p class="lab" style="color:var(--brand)">The situation</p><p class="txt" style="font-style:italic">${esc(sc.context)}</p></div>
+      <div class="block"><p class="lab">Do this</p><p class="txt">${esc(sc.action)}</p></div>
+      <div class="block"><p class="lab">You should see</p><p class="txt">${esc(sc.expected)}</p></div>
+
+      <div class="qlab">How did it go?</div>
+      <div class="pfi">
+        <button data-st="pass" class="${r.status==='pass'?'sel-pass':''}"><span class="ic">✓</span>Pass</button>
+        <button data-st="fail" class="${r.status==='fail'?'sel-fail':''}"><span class="ic">✕</span>Fail</button>
+        <button data-st="issue" class="${r.status==='issue'?'sel-issue':''}"><span class="ic">⚑</span>Issue</button>
+      </div>
+      ${sevHtml}
+      <div class="notes">
+        <div class="qlab">Notes ${r.status==='fail'||r.status==='issue'?'<span style="color:var(--fail);font-weight:600">· please describe what happened</span>':'<span style="color:var(--ink-faint);font-weight:400">(optional)</span>'}</div>
+        <textarea id="notes" placeholder="What did you do, what happened, and what did you expect?">${esc(r.notes)}</textarea>
+      </div>
+    </div>`;
+
+  const isLast=S.stepIndex===scenarios().length-1;
+  const backLabel = EDIT_FROM_SUMMARY ? "← Back to review" : (S.stepIndex===0 ? "← Change role" : "← Previous");
+  const nextLabel = EDIT_FROM_SUMMARY ? "Save & return to review" : (isLast ? "Review & submit →" : "Next →");
+  setNav(`<button class="btn ghost" id="back">${backLabel}</button>
+          <button class="btn primary wide" id="next">${nextLabel}</button>`);
+
+  function persistNotes(){ const t=document.getElementById("notes"); ensure(sc.id).notes=t.value; save(); }
+  document.getElementById("notes").addEventListener("input",e=>{ensure(sc.id).notes=e.target.value;});
+  document.getElementById("notes").addEventListener("blur",save);
+
+  document.querySelectorAll(".pfi button").forEach(b=>b.onclick=()=>{
+    persistNotes();
+    const st=b.dataset.st; const cur=ensure(sc.id);
+    cur.status=st; if(st!=="issue") cur.severity=null;
+    save(); renderStep(); renderRail();
+  });
+  document.querySelectorAll(".sevrow button").forEach(b=>b.onclick=()=>{
+    persistNotes(); ensure(sc.id).severity=b.dataset.sev; save(); renderStep();
+  });
+  document.getElementById("back").onclick=()=>{
+    persistNotes();
+    if(EDIT_FROM_SUMMARY){ EDIT_FROM_SUMMARY=false; VIEW="summary"; render(); window.scrollTo(0,0); return; }
+    if(S.stepIndex===0){ VIEW="role"; render(); }
+    else { S.stepIndex--; save(); renderStep(); window.scrollTo(0,0); }
+  };
+  document.getElementById("next").onclick=()=>{
+    persistNotes();
+    const cur=S.results[sc.id];
+    if(!cur||!cur.status){ flashNeed(); return; }
+    if(EDIT_FROM_SUMMARY){ EDIT_FROM_SUMMARY=false; VIEW="summary"; render(); window.scrollTo(0,0); return; }
+    // first-impressions after very first answered step (not for edge cases)
+    if(S.stepIndex===0 && !S.impressionsDone && S.role!=="edge"){ VIEW="impressions"; render(); window.scrollTo(0,0); return; }
+    if(isLast){ VIEW="summary"; render(); window.scrollTo(0,0); }
+    else { S.stepIndex++; save(); renderStep(); window.scrollTo(0,0); }
+  };
+}
+function ensure(id){ if(!S.results[id]) S.results[id]={status:null,severity:null,notes:""}; return S.results[id]; }
+function flashNeed(){
+  const pfi=document.querySelector(".pfi");
+  if(pfi){ pfi.style.outline="2px solid var(--fail)"; pfi.style.outlineOffset="6px"; pfi.style.borderRadius="12px";
+    setTimeout(()=>{pfi.style.outline="";},1200); }
+}
+
+/* ---------- First impressions ---------- */
+function renderImpressions(){
+  const im=S.impressions||{rating:0};
+  root.innerHTML=`
+   <div class="card pad">
+     <p class="eyebrow">Quick check-in</p>
+     <h2 class="steptitle">First impressions</h2>
+     <p class="lead" style="margin-bottom:18px">You've seen the app for the first time. Before we go further — a few quick gut-reaction questions. Skip any that don't apply.</p>
+     ${IMPRESSION_QS.map(q=>`
+       <div class="notes" style="margin-top:0;margin-bottom:18px">
+         <div class="qlab" style="margin-top:0">${esc(q.q)}</div>
+         <textarea data-im="${q.id}" placeholder="A sentence or two is plenty.">${esc(im[q.id]||"")}</textarea>
+       </div>`).join("")}
+     <div class="qlab">Overall first impression</div>
+     <div class="sevrow" style="grid-template-columns:repeat(5,1fr)" id="stars">
+       ${[1,2,3,4,5].map(n=>`<button data-rate="${n}" class="${im.rating>=n?'on':''}" data-sev="Suggestion" style="${im.rating>=n?'':'color:var(--ink-soft)'}">${n}</button>`).join("")}
+     </div>
+     <p class="hint">1 = rough · 5 = loved it</p>
+   </div>`;
+  setNav(`<button class="btn primary wide lg" id="cont">Continue to scenarios →</button>`);
+  function collect(){
+    const o={rating:(S.impressions&&S.impressions.rating)||0};
+    document.querySelectorAll("[data-im]").forEach(t=>o[t.dataset.im]=t.value);
+    S.impressions=o; save();
+  }
+  document.querySelectorAll("[data-im]").forEach(t=>t.addEventListener("input",()=>collect()));
+  document.querySelectorAll("[data-rate]").forEach(b=>b.onclick=()=>{
+    collect(); S.impressions.rating=+b.dataset.rate; save(); renderImpressions();
+  });
+  document.getElementById("cont").onclick=()=>{
+    collect(); S.impressionsDone=true; S.stepIndex=1; save();
+    VIEW="step"; render(); window.scrollTo(0,0);
+  };
+}
+
+/* ---------- Summary ---------- */
+function summaryCounts(){
+  let pass=0,fail=0,issue=0;
+  scenarios().forEach(s=>{if(s.isPause)return; const r=S.results[s.id];if(!r)return;
+    if(r.status==="pass")pass++;else if(r.status==="fail")fail++;else if(r.status==="issue")issue++;});
+  return {pass,fail,issue};
+}
+function renderSummary(){
+  const c=summaryCounts();
+  const unanswered=scenarios().filter(s=>!s.isPause&&(!S.results[s.id]||!S.results[s.id].status));
+  const rows=scenarios().map((s,i)=>{
+    if(s.isPause) return `<div class="sumrow" style="opacity:.45"><span class="tag" style="background:var(--brand-tint);color:var(--brand)">PAUSE</span><div class="body"><div class="t">${esc(s.title)}</div></div></div>`;
+    const r=S.results[s.id]||{};
+    const tag=r.status?`<span class="tag ${r.status}">${r.status}</span>`:`<span class="tag none">—</span>`;
+    const sev=r.status==="issue"&&r.severity?`<span class="sevchip" data-sev="${r.severity}">${r.severity}</span>`:"";
+    const notes=r.notes?`<div class="n">${esc(r.notes)}</div>`:"";
+    return `<div class="sumrow">${tag}
+      <div class="body"><div class="t">${esc(s.title)}${sev}</div>${notes}
+      <button class="editlink" data-edit="${i}">Edit</button></div></div>`;
+  }).join("");
+  const already = !!S.submittedAt;
+  root.innerHTML=`
+    <div class="card pad">
+      <p class="eyebrow">${esc(track().label)} · Review</p>
+      <h2 class="steptitle">${already?"Your submitted feedback":"Review before you submit"}</h2>
+      ${already?`<div class="banner" style="background:var(--pass-tint);border-color:var(--pass);color:var(--pass)">Submitted ${esc(new Date(S.submittedAt).toLocaleString())}. You can edit and re-submit if needed.</div>`:""}
+      <div class="counts">
+        <span class="count pass">${c.pass} Pass</span>
+        <span class="count fail">${c.fail} Fail</span>
+        <span class="count issue">${c.issue} Issue</span>
+      </div>
+      ${unanswered.length?`<div class="banner">${unanswered.length} scenario${unanswered.length>1?"s":""} still unanswered. You can submit anyway, or tap Edit to fill them in.</div>`:""}
+      ${rows}
+    </div>`;
+  let btn;
+  if(SUBMIT_STATE==="sending") btn=`<button class="btn primary wide lg" disabled>Submitting…</button>`;
+  else btn=`<button class="btn primary wide lg" id="submit">${already?"Re-submit feedback":"Submit feedback"}</button>`;
+  setNav(`<button class="btn ghost" id="back">← Back</button>${btn}`);
+  document.getElementById("back").onclick=()=>{ S.stepIndex=scenarios().length-1; VIEW="step"; render(); window.scrollTo(0,0); };
+  document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{
+    EDIT_FROM_SUMMARY=true; S.stepIndex=+b.dataset.edit; VIEW="step"; render(); window.scrollTo(0,0);
+  });
+  const sb=document.getElementById("submit"); if(sb) sb.onclick=submit;
+}
+
+/* ---------- Submit ---------- */
+function buildReport(){
+  const c=summaryCounts();
+  return {
+    app:"Solvalt Insights Beta Feedback", version:APP_VERSION,
+    tester:S.name, email:S.email||"", company:S.company, accountId:S.accountId||"", role:S.role, roleLabel:track().label,
+    startedAt:S.startedAt, submittedAt:new Date().toISOString(),
+    summary:c,
+    firstImpressions:S.impressions||null,
+    results:scenarios().filter(s=>!s.isPause).map(s=>{const r=S.results[s.id]||{};
+      return {id:s.id, title:s.title, status:r.status||"unanswered", severity:r.severity||null, notes:r.notes||""};})
+  };
+}
+function reportText(rep){
+  const L=[];
+  L.push(`SOLVALT INSIGHTS — BETA FEEDBACK`);
+  L.push(`${rep.roleLabel} track · ${rep.version}`);
+  L.push(`Tester: ${rep.tester}${rep.company?" ("+rep.company+")":""}`);
+  L.push(`Submitted: ${new Date(rep.submittedAt).toLocaleString()}`);
+  L.push(`Result: ${rep.summary.pass} pass · ${rep.summary.fail} fail · ${rep.summary.issue} issue`);
+  L.push("");
+  if(rep.firstImpressions){const fi=rep.firstImpressions;
+    L.push("FIRST IMPRESSIONS");
+    L.push(`  Overall: ${fi.rating?fi.rating+"/5":"—"}`);
+    if(fi.confused)L.push(`  Confusing: ${fi.confused}`);
+    if(fi.natural)L.push(`  Natural: ${fi.natural}`);
+    if(fi.missing)L.push(`  Missing: ${fi.missing}`);
+    L.push("");}
+  L.push("SCENARIOS");
+  rep.results.forEach((r,i)=>{
+    L.push(`  ${i+1}. [${r.status.toUpperCase()}]${r.severity?" ("+r.severity+")":""} ${r.title}`);
+    if(r.notes)L.push(`     ${r.notes}`);
+  });
+  return L.join("\n");
+}
+function download(rep){
+  const blob=new Blob([JSON.stringify(rep,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`solvalt-beta_${slug(rep.tester)}_${rep.role}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function submit(){
+  const rep=buildReport();
+  S.submittedAt=rep.submittedAt; save();
+  if(API_BASE){
+    SUBMIT_STATE="sending"; renderSummary();
+    fetch(API_BASE.replace(/\/$/,"")+"/beta-feedback",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(rep)
+    }).then(r=>{ if(!r.ok) throw new Error("status "+r.status); return r.json().catch(()=>({}));})
+      .then(()=>{ SUBMIT_STATE="sent"; VIEW="done"; render(); window.scrollTo(0,0); })
+      .catch(()=>{ SUBMIT_STATE="offline"; VIEW="done"; render(); window.scrollTo(0,0); });
+  } else {
+    SUBMIT_STATE="offline"; VIEW="done"; render(); window.scrollTo(0,0);
+  }
+}
+
+/* ---------- Done ---------- */
+function renderDone(){
+  const rep=buildReport(); rep.submittedAt=S.submittedAt;
+  const offline = SUBMIT_STATE==="offline";
+  root.innerHTML=`
+   <div class="card pad center">
+     <div class="done-ic">✓</div>
+     <h2 class="steptitle" style="margin-bottom:6px">Thanks, ${esc(S.name.split(" ")[0]||"")} — that's logged.</h2>
+     ${offline
+       ? `<p class="lead">Your feedback is saved on this device. To make sure we receive it, download the report below and email it to <b>${ALERT_TO}</b>.</p>
+          <div style="height:8px"></div>
+          <button class="btn primary lg" id="dl">Download my report</button>
+          <p class="hint">A .json file — just attach it to an email.</p>`
+       : `<p class="lead">Your feedback for the ${esc(track().label)} track has been received. You're welcome to download a copy for your records.</p>
+          <div style="height:8px"></div>
+          <button class="btn lg" id="dl">Download a copy</button>`}
+     <div style="height:22px"></div>
+     <div style="border-top:1px solid var(--line-soft);padding-top:18px">
+       <p class="muted">Want to test another role?</p>
+       <button class="btn" id="another" style="margin-top:8px">Run another track</button>
+     </div>
+   </div>`;
+  setNav("");
+  document.getElementById("dl").onclick=()=>download(rep);
+  document.getElementById("another").onclick=()=>{ window._pending={name:S.name,email:S.email,company:S.company,accountId:S.accountId||""}; VIEW="role"; SUBMIT_STATE=null; render(); window.scrollTo(0,0); };
+}
+
+/* ============================================================
+   COORDINATOR VIEW  (?view=coordinator)
+   ============================================================ */
+let COORD_DATA=[]; // array of reports
+function renderCoordinator(){
+  rolepill.innerHTML=`<div class="rolepill">Coordinator</div>`; railzone.innerHTML="";
+  const haveApi=!!API_BASE;
+  root.innerHTML=`
+    <div style="margin-top:6px">
+      <div class="coordhead">
+        <p class="eyebrow" style="margin:0">Coordinator</p>
+      </div>
+      <h1 style="font-size:23px;margin:0 0 6px">Beta feedback dashboard</h1>
+      <p class="lead">${haveApi?"Live submissions from the feedback API, aggregated by scenario.":"Import the .json reports testers emailed you to aggregate them here."}</p>
+      <div style="margin:14px 0">
+        ${haveApi?`<button class="btn primary" id="refresh">Refresh from API</button>`:""}
+        <div class="dz" id="dz" style="margin-top:12px">Drop tester .json reports here, or tap to choose files
+          <input type="file" id="file" accept="application/json,.json" multiple hidden></div>
+      </div>
+      <div id="agg"></div>
+    </div>`;
+  setNav("");
+  const dz=document.getElementById("dz"), file=document.getElementById("file");
+  dz.onclick=()=>file.click();
+  dz.ondragover=e=>{e.preventDefault();dz.classList.add("over");};
+  dz.ondragleave=()=>dz.classList.remove("over");
+  dz.ondrop=e=>{e.preventDefault();dz.classList.remove("over");importFiles(e.dataTransfer.files);};
+  file.onchange=e=>importFiles(e.target.files);
+  const rf=document.getElementById("refresh"); if(rf) rf.onclick=fetchCoord;
+  if(haveApi) fetchCoord(); else { COORD_DATA=listLocalSubmissions().map(s=>localToReport(s)); renderAgg(); }
+}
+function localToReport(s){
+  const t=TRACKS[s.role]; const c={pass:0,fail:0,issue:0};
+  const results=(t?t.scenarios:[]).map(sc=>{const r=(s.results||{})[sc.id]||{};
+    if(r.status==="pass")c.pass++;else if(r.status==="fail")c.fail++;else if(r.status==="issue")c.issue++;
+    return {id:sc.id,title:sc.title,status:r.status||"unanswered",severity:r.severity||null,notes:r.notes||""};});
+  return {tester:s.name,company:s.company,role:s.role,roleLabel:t?t.label:s.role,
+          submittedAt:s.submittedAt,summary:c,firstImpressions:s.impressions||null,results};
+}
+function importFiles(files){
+  const arr=[...files]; let pending=arr.length;
+  if(!pending) return;
+  arr.forEach(f=>{const rd=new FileReader();
+    rd.onload=()=>{try{const rep=JSON.parse(rd.result);
+      if(rep&&rep.role&&rep.results){ if(!COORD_DATA.some(d=>d.tester===rep.tester&&d.role===rep.role&&d.submittedAt===rep.submittedAt)) COORD_DATA.push(rep); }
+    }catch(e){} if(--pending===0) renderAgg();};
+    rd.onerror=()=>{if(--pending===0)renderAgg();}; rd.readAsText(f);});
+}
+function fetchCoord(){
+  const agg=document.getElementById("agg"); if(agg) agg.innerHTML=`<p class="muted">Loading…</p>`;
+  fetch(API_BASE.replace(/\/$/,"")+"/beta-feedback")
+    .then(r=>r.json()).then(d=>{COORD_DATA=Array.isArray(d)?d:(d.items||d.submissions||[]);renderAgg();})
+    .catch(()=>{const a=document.getElementById("agg");if(a)a.innerHTML=`<div class="banner">Couldn't reach the API. You can still import .json reports above.</div>`;});
+}
+function renderAgg(){
+  const agg=document.getElementById("agg"); if(!agg) return;
+  if(!COORD_DATA.length){ agg.innerHTML=`<p class="muted" style="padding:20px 0">No submissions yet.</p>`; return; }
+  // group by role then scenario
+  const byRole={};
+  COORD_DATA.forEach(rep=>{(byRole[rep.role]=byRole[rep.role]||[]).push(rep);});
+  let html=`<p class="muted" style="margin-bottom:14px"><b>${COORD_DATA.length}</b> submission${COORD_DATA.length>1?"s":""} from <b>${new Set(COORD_DATA.map(r=>r.tester)).size}</b> tester(s).</p>`;
+  Object.entries(byRole).forEach(([role,reps])=>{
+    const t=TRACKS[role]; const scs=t?t.scenarios:[];
+    html+=`<div class="card pad" style="margin-bottom:16px"><h3 style="margin:0 0 12px;font-size:16px">${esc(t?t.label:role)} <span class="muted" style="font-weight:400">· ${reps.length} tester(s)</span></h3>`;
+    scs.forEach(sc=>{
+      let p=0,f=0,iss=0; const issues=[];
+      reps.forEach(rep=>{const r=(rep.results||[]).find(x=>x.id===sc.id);if(!r)return;
+        if(r.status==="pass")p++;else if(r.status==="fail")f++;else if(r.status==="issue")iss++;
+        if((r.status==="fail"||r.status==="issue")&&(r.notes||r.severity))
+          issues.push({tester:rep.tester,status:r.status,severity:r.severity,notes:r.notes});});
+      const tot=p+f+iss||1;
+      html+=`<div class="aggrow"><div class="aggtitle">${esc(sc.title)}</div>
+        <div class="bar">
+          ${p?`<span class="b-pass" style="flex:${p}">${p}</span>`:""}
+          ${f?`<span class="b-fail" style="flex:${f}">${f}</span>`:""}
+          ${iss?`<span class="b-issue" style="flex:${iss}">${iss}</span>`:""}
+          ${(p+f+iss)===0?`<span style="flex:1;color:var(--ink-faint)">no data</span>`:""}
+        </div>`;
+      if(issues.length){ html+=`<div class="issuelist">`+issues.map(x=>
+        `<div class="il"><b>${esc(x.tester)}</b> ${x.severity?`<span class="sevchip" data-sev="${esc(x.severity)}">${esc(x.severity)}</span>`:`<span class="tag ${x.status}" style="padding:1px 6px">${x.status}</span>`}${x.notes?` — ${esc(x.notes)}`:""}</div>`
+      ).join("")+`</div>`; }
+      html+=`</div>`;
+    });
+    html+=`</div>`;
+  });
+  agg.innerHTML=html;
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+render();
+</script>
+</body>
+</html>
