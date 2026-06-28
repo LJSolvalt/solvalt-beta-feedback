@@ -178,7 +178,7 @@
 // When the Functions endpoint is live, set this to the API base, e.g.
 // "https://solvalt-insights-api-exbgenasc7h0hsbq.eastus-01.azurewebsites.net/api"
 const API_BASE = "https://solvalt-insights-api-exbgenasc7h0hsbq.eastus-01.azurewebsites.net/api";
-const ALERT_TO = "admin@solvaltinc.com";
+const ALERT_TO = "louis.haynes@solvaltinc.com";
 const APP_VERSION = "v0.9-beta";
 
 /* ============================================================
@@ -186,19 +186,19 @@ const APP_VERSION = "v0.9-beta";
    ============================================================ */
 const BETA_ACCOUNTS = [
   {
-    id:"cust_tampa_001", company:"Suncoast Portable Solutions", city:"Tampa, FL", prefix:"TB",
+    id:"cust_tampa_001", company:"Suncoast Portable Solutions", city:"Tampa, FL", prefix:"TB", domain:"suncoastportable.com",
     units:Array.from({length:25},(_,i)=>`TB-${String(i+1).padStart(3,"0")}`)
   },
   {
-    id:"cust_columbia_beta_001", company:"Midlands Sanitation Services", city:"Columbia, SC", prefix:"MS",
+    id:"cust_columbia_beta_001", company:"Midlands Sanitation Services", city:"Columbia, SC", prefix:"MS", domain:"midlandssanitation.com",
     units:Array.from({length:25},(_,i)=>`MS-${String(i+1).padStart(3,"0")}`)
   },
   {
-    id:"cust_blythewood_001", company:"Blythewood Sanitation Co.", city:"Blythewood, SC", prefix:"BW",
+    id:"cust_blythewood_001", company:"Blythewood Sanitation Co.", city:"Blythewood, SC", prefix:"BW", domain:"blythewoodsanitation.com",
     units:Array.from({length:25},(_,i)=>`BW-${String(i+1).padStart(3,"0")}`)
   },
   {
-    id:"cust_charleston_001", company:"Lowcountry Portable Services", city:"Charleston, SC", prefix:"LC",
+    id:"cust_charleston_001", company:"Lowcountry Portable Services", city:"Charleston, SC", prefix:"LC", domain:"lowcountryportable.com",
     units:Array.from({length:25},(_,i)=>`LC-${String(i+1).padStart(3,"0")}`)
   }
 ];
@@ -531,15 +531,20 @@ function renderAccount(){
   const credCard=acct?`
     <div style="margin-top:18px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:16px">
       <p style="font-weight:700;font-size:13px;color:var(--brand);margin:0 0 10px">🔑 Your login credentials</p>
-      <p style="font-size:13px;color:var(--ink-soft);margin:0 0 8px">Your setup email contains the username and password for each role below. Use the correct one when testing each track.</p>
+      <p style="font-size:13px;color:var(--ink-soft);margin:0 0 8px">Use these credentials when logging in to test each role. All accounts share the same password.</p>
       <div style="display:grid;gap:8px">
-        ${["Admin","Operator","Driver"].map(r=>`
+        ${[["Admin","admin"],["Operator","operator"],["Driver","driver"]].map(([r,role])=>`
           <div style="background:var(--surface-3);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">
             <span style="font-weight:700;font-size:12px;color:var(--brand);background:var(--brand-tint);padding:3px 8px;border-radius:6px;white-space:nowrap">${r}</span>
-            <span style="font-size:13px;color:var(--ink-soft)">See your setup email for ${r.toLowerCase()} credentials</span>
+            <span style="font-size:13px;color:var(--ink);font-family:monospace">${role}@${acct.domain}</span>
+            <span style="font-size:12px;color:var(--ink-faint)">/ beta1234</span>
           </div>`).join("")}
       </div>
       <div style="margin-top:12px;background:var(--surface-3);border-radius:8px;padding:10px 12px">
+        <p style="font-size:12px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px">Platform URL</p>
+        <p style="font-size:13px;color:var(--ink);margin:0;font-family:monospace"><a href="https://staging-full.solvaltinsights.com" style="color:var(--brand)">staging-full.solvaltinsights.com</a></p>
+      </div>
+      <div style="margin-top:8px;background:var(--surface-3);border-radius:8px;padding:10px 12px">
         <p style="font-size:12px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px">Unit IDs for your account</p>
         <p style="font-size:13px;color:var(--ink);margin:0;font-family:monospace;letter-spacing:.04em">${acct.units.slice(0,5).join("  ")}  <span style="color:var(--ink-faint)">… through ${acct.units[acct.units.length-1]}</span></p>
         <p style="font-size:12px;color:var(--ink-soft);margin:6px 0 0">These IDs will be referenced in the scanning scenarios. Use them when prompted to enter a unit ID manually.</p>
@@ -572,15 +577,20 @@ function renderAccount(){
     document.getElementById("cred-card").innerHTML=a?`
       <div style="margin-top:18px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:16px">
         <p style="font-weight:700;font-size:13px;color:var(--brand);margin:0 0 10px">🔑 Your login credentials</p>
-        <p style="font-size:13px;color:var(--ink-soft);margin:0 0 8px">Your setup email contains the username and password for each role below. Use the correct one when testing each track.</p>
+        <p style="font-size:13px;color:var(--ink-soft);margin:0 0 8px">Use these credentials when logging in to test each role. All accounts share the same password.</p>
         <div style="display:grid;gap:8px">
-          ${["Admin","Operator","Driver"].map(r=>`
+          ${[["Admin","admin"],["Operator","operator"],["Driver","driver"]].map(([r,role])=>`
             <div style="background:var(--surface-3);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">
               <span style="font-weight:700;font-size:12px;color:var(--brand);background:var(--brand-tint);padding:3px 8px;border-radius:6px;white-space:nowrap">${r}</span>
-              <span style="font-size:13px;color:var(--ink-soft)">See your setup email for ${r.toLowerCase()} credentials</span>
+              <span style="font-size:13px;color:var(--ink);font-family:monospace">${role}@${a.domain}</span>
+              <span style="font-size:12px;color:var(--ink-faint)">/ beta1234</span>
             </div>`).join("")}
         </div>
-        <div style="margin-top:12px;background:var(--surface-3);border-radius:8px;padding:10px 12px">
+        <div style="margin-top:8px;background:var(--surface-3);border-radius:8px;padding:10px 12px">
+          <p style="font-size:12px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px">Platform URL</p>
+          <p style="font-size:13px;color:var(--ink);margin:0;font-family:monospace"><a href="https://staging-full.solvaltinsights.com" style="color:var(--brand)">staging-full.solvaltinsights.com</a></p>
+        </div>
+        <div style="margin-top:8px;background:var(--surface-3);border-radius:8px;padding:10px 12px">
           <p style="font-size:12px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px">Unit IDs for your account</p>
           <p style="font-size:13px;color:var(--ink);margin:0;font-family:monospace;letter-spacing:.04em">${a.units.slice(0,5).join("  ")}  <span style="color:var(--ink-faint)">… through ${a.units[a.units.length-1]}</span></p>
           <p style="font-size:12px;color:var(--ink-soft);margin:6px 0 0">These IDs will be referenced in the scanning scenarios. Use them when prompted to enter a unit ID manually.</p>
