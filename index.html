@@ -229,7 +229,7 @@ const TRACKS = {
         expected:"New client appears in the list showing tier pills instead of a single rate. Units assigned to different tiers show the correct tier label in the panel. Tier switching updates immediately. Delete is blocked when units are on the tier and allowed when it\'s empty. Archived client drops off the active list."},
       {id:"a3", title:"Route planning",
         context:"You want a reusable route for an area you service regularly.",
-        action:"Go to Routes (left nav) → Saved Routes tab. Click '+ New Route Template', give it a name, select units by zone, set a default driver, then save.",
+        action:"Go to Schedule (left nav) → Saved Routes tab. Click '+ New Route Template', give it a name, select units by zone, set a default driver, then save.",
         expected:"The route saves and shows up in Saved Routes with the units you selected."},
       {id:"a4", title:"Scheduling & dispatch",
         context:"Time to put a crew on the road today. To test Turn-by-Turn Navigation later, units need GPS coordinates — these are captured when a driver Deploys a unit via the Scan page. If your units were seeded without a Deploy scan, complete the optional GPS step below first.",
@@ -295,9 +295,9 @@ const TRACKS = {
         action:"Open the stop for unit {{unit2}} on your route. Instead of scanning or typing an ID, tap 'Mark complete without scanning'.",
         expected:"The stop moves to completed and shows up in your recent activity."},
       {id:"d5", title:"A two-route day",
-        context:"You've been given two routes today.",
-        action:"Switch between the route tabs and check that the right stops show under each one.",
-        expected:"Each tab shows its own correct set of stops."},
+        context:"You've been given two routes today. Note: this scenario requires your admin or coordinator to have dispatched two separate routes to your driver account before you start — if you only see one route tab, skip this scenario and let your coordinator know.",
+        action:"On the Routes tab, look for two route tabs at the top. Switch between them and confirm each tab shows its own correct set of stops.",
+        expected:"Each tab shows its own correct set of stops. Switching tabs does not mix up the stop lists."},
       {id:"d6", title:"Route map & turn-by-turn navigation",
         context:"You want to see your stops on a map and launch navigation. Note: The Navigate button only appears if units have GPS coordinates from a Deploy scan — if Admin completed the GPS setup step in A4, those units will be ready. Navigation opens Google Maps only (not Apple Maps), so make sure Google Maps is installed on your device.",
         action:"1. Tap the Map button on your active route. Confirm numbered markers appear in stop order on the map. Tap a marker — it should open that stop's scan page.\n2. Look for the Navigate button in the map header (it appears when uncompleted stops have GPS coordinates). Tap it.\n3. Confirm Google Maps opens with your remaining stops loaded as waypoints in stop order.\n4. Verify the first stop matches the next stop on your route list.",
@@ -335,7 +335,7 @@ const TRACKS = {
       {id:"o4", title:"Monitor active routes",
         context:"A driver is out working.",
         action:"Stay on the Schedule page and watch the live stop progress as stops get completed by the driver.",
-        expected:"Progress updates live as each stop is completed — no refresh needed."},
+        expected:"Progress updates as each stop is completed — refresh the page to see the latest stop counts. The progress bar and completed stop count will update each time you refresh."},
       {id:"o5", title:"Map monitoring",
         context:"You want a visual read on the field.",
         action:"Go to Map (left nav). Check unit locations and review status coloring across the zones.",
@@ -349,9 +349,12 @@ const TRACKS = {
         action:"On the Schedule page, find the active route and click Recall. Edit the driver assignment, then re-dispatch to a different driver.",
         expected:"The recall works, the driver change saves, and the new driver receives the route."},
       {id:"o8", title:"Client context & unit assignment",
-        context:"You need to check which units belong to which client, then move a unit.",
-        action:"Go to Clients (left nav). Review the unit lists under each client. Then open the Units page, pick a unit, and reassign it to a different client using the client assignment field.",
-        expected:"Each client clearly shows their assigned units. The reassigned unit moves to the new client immediately."}
+        context:"You need to set up clients, assign units to them, then move a unit between clients.",
+        action:"1. Go to Clients (left nav). Click '+ New Client', fill in name and contact info, add at least one rate tier, and save.
+2. Once created, click 'Assign Units' on the client card. Select 3-5 available units and confirm.
+3. Create a second client the same way and assign a few different units to it.
+4. Now reassign one unit from the first client to the second — use the Assign Units panel to move it.",
+        expected:"Both clients appear in the list with their assigned units shown. The reassigned unit disappears from the first client and appears under the second immediately."}
     ]
   },
   edge: {
@@ -363,10 +366,10 @@ const TRACKS = {
         context:"Your phone's location is switched off.",
         action:"In your phone settings, turn off location for the browser or the app. Then open the app and try to scan or complete a stop.",
         expected:"The app handles it gracefully — a clear message appears, no crash."},
-      {id:"e2", title:"QR scan then manual entry",
-        context:"You want to test both the camera scan and the manual entry fallback.",
-        action:"1. First: tap a stop and use your phone camera to scan the QR code on a physical unit card (your setup email includes a QR sheet).\n2. Submit the action and confirm it logs.\n3. Next: on a different stop, skip the camera and manually type unit ID {{unit3}}.\n4. Submit and confirm that logs too.",
-        expected:"Both methods — camera scan and manual entry — log the service action correctly."},
+      {id:"e2", title:"Manual unit entry",
+        context:"You want to confirm that typing a unit ID manually works correctly.",
+        action:"1. Tap any stop on your route. Instead of scanning, type the unit ID manually in the ID field.\n2. Submit and confirm the action logs.\n3. Repeat on a second stop with a different unit ID.",
+        expected:"Manual entry logs the service action correctly and both stops complete on your route."},
       {id:"e3", title:"Unit not on your route",
         context:"You end up servicing a unit that wasn't on today's list.",
         action:"Go to the scan page and manually enter unit ID {{unit_offroute}} — this unit is not on today's route. Submit a service action.",
