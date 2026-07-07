@@ -233,11 +233,7 @@ const TRACKS = {
         expected:"The route saves and shows up in Saved Routes with the units you selected."},
       {id:"a4", title:"Scheduling & dispatch",
         context:"Time to put a crew on the road. You'll build a schedule from a saved route template and push it to a driver.",
-        action:"1. Go to Schedule (left nav).
-2. Click '+ New Schedule'. Choose today's date, select the route template you created in A3, and assign it to your driver.
-3. Click 'Create Schedule'. The route appears in the list with a Pending status.
-4. Find the route in the list and click 'Push to Driver' to dispatch it.
-5. Confirm the status updates to Dispatched.",
+        action:"1. Go to Schedule (left nav).\n2. Click '+ New Schedule'. Choose today's date, select the route template you created in A3, and assign it to your driver.\n3. Click 'Create Schedule'. The route appears in the list with a Pending status.\n4. Find the route in the list and click 'Push to Driver' to dispatch it.\n5. Confirm the status updates to Dispatched.",
         expected:"The schedule is created and appears in the list. After clicking Push to Driver the status changes to Dispatched and the driver can see the route on their Routes tab."},
       {id:"a_pause", title:"⏸ Switch to Driver now",
         context:"The next Admin scenarios require live stop data from a driver actively working the route you just dispatched.",
@@ -258,10 +254,7 @@ const TRACKS = {
         expected:"The Generate Invoice dialog shows one date row per tier for multi-tier clients. Each tier\'s units are billed at their own rate for their own date range. Monthly units show 1 period; daily event units show the correct number of days. The status change saves and reflects in the invoice list."},
       {id:"a7b", title:"Billing — apply a discount",
         context:"A client negotiated a reduced rate and you need to apply a discount before sending.",
-        action:"1. Go to Billing (left nav) and open the invoice from the previous step (or any Draft or Sent invoice).
-2. Click 'Add Discount'. Enter a flat dollar amount (e.g. $25) and save. Confirm it appears as a line item.
-3. To switch to a percentage: remove the current discount first by clicking its remove icon. Then click 'Add Discount' again, switch the type to Percent, enter 10%, and save. Only one discount can be active at a time.
-4. Remove the discount and confirm it disappears.",
+        action:"1. Go to Billing (left nav) and open the invoice from the previous step (or any Draft or Sent invoice).\n2. Click 'Add Discount'. Enter a flat dollar amount (e.g. $25) and save. Confirm it appears as a line item.\n3. To switch to a percentage: remove the current discount first by clicking its remove icon. Then click 'Add Discount' again, switch the type to Percent, enter 10%, and save. Only one discount can be active at a time.\n4. Remove the discount and confirm it disappears.",
         expected:"Discounts save and appear as a line item. Only one discount is active at a time — switching types requires removing the existing one first. Removing the discount clears it completely."},
       {id:"a7c", title:"Reports",
         context:"You want to review service activity and fleet status using the new Reports page. Note: reports only show data that exists in the system — if your account is new, some reports may have limited data.",
@@ -273,9 +266,7 @@ const TRACKS = {
         expected:"The user is created and appears in the Users list. An invitation email arrives at the address you entered."},
       {id:"a9", title:"QR code management",
         context:"You want to review your QR code inventory and understand what happens when stock runs low.",
-        action:"1. Go to QR Codes (left nav).
-2. Review the pool — check how many codes are Reserved, Active, and Retired using the filter tabs.
-3. If a low inventory banner is showing (fewer than 20 reserved codes remaining), note what it says. QR code replenishment is handled by Solvalt, not ordered through the app — the banner will prompt you to contact Solvalt directly.",
+        action:"1. Go to QR Codes (left nav).\n2. Review the pool — check how many codes are Reserved, Active, and Retired using the filter tabs.\n3. If a low inventory banner is showing (fewer than 20 reserved codes remaining), note what it says. QR code replenishment is handled by Solvalt, not ordered through the app — the banner will prompt you to contact Solvalt directly.",
         expected:"The QR Codes page shows Reserved, Active, and Retired counts clearly. If inventory is low a warning banner appears with instructions to contact Solvalt. There is no self-service order button — replenishment is Solvalt-managed."},
       {id:"a10", title:"Settings & savings configuration",
         context:"Your real cost numbers are different from the defaults.",
