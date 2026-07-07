@@ -232,9 +232,13 @@ const TRACKS = {
         action:"Go to Schedule (left nav) → Saved Routes tab. Click '+ New Route Template', give it a name, select units by zone, set a default driver, then save.",
         expected:"The route saves and shows up in Saved Routes with the units you selected."},
       {id:"a4", title:"Scheduling & dispatch",
-        context:"Time to put a crew on the road today. To test Turn-by-Turn Navigation later, units need GPS coordinates — these are captured when a driver Deploys a unit via the Scan page. If your units were seeded without a Deploy scan, complete the optional GPS step below first.",
-        action:"Optional GPS setup (needed for Turn-by-Turn Navigation):\n1. Open the app on a phone or browser, log in as your driver.\n2. Go to Scan → open camera or type a unit ID → select action 'Deploy' → allow location when prompted → Submit. Repeat for 2–3 units.\n3. Return here as Admin.\n\nSchedule & Dispatch:\n1. Go to Schedule (left nav). Click '+ New Schedule', choose today's date, select the route template you just created, assign it to your driver, then click Dispatch.",
-        expected:"The route shows as Dispatched. The driver you assigned will see it on their end. If you completed the GPS setup, those units will show a Navigate button on the Route Map — you'll verify this in the Driver track."},
+        context:"Time to put a crew on the road. You'll build a schedule from a saved route template and push it to a driver.",
+        action:"1. Go to Schedule (left nav).
+2. Click '+ New Schedule'. Choose today's date, select the route template you created in A3, and assign it to your driver.
+3. Click 'Create Schedule'. The route appears in the list with a Pending status.
+4. Find the route in the list and click 'Push to Driver' to dispatch it.
+5. Confirm the status updates to Dispatched.",
+        expected:"The schedule is created and appears in the list. After clicking Push to Driver the status changes to Dispatched and the driver can see the route on their Routes tab."},
       {id:"a_pause", title:"⏸ Switch to Driver now",
         context:"The next Admin scenarios require live stop data from a driver actively working the route you just dispatched.",
         action:"Save your progress here, then switch to the Driver track and complete all Driver scenarios (D1–D9). The driver will complete stops on the route you just dispatched. Once finished, come back to Admin and continue from Scenario 5.",
@@ -253,9 +257,12 @@ const TRACKS = {
         action:"1. Go to Billing (left nav). Click '+ Generate Invoice'.\n2. Select the multi-tier client you created in A2 from the dropdown. Note the dropdown label should show the unit count and tier count (e.g. \'8 units · 2 tiers\').\n3. For a single-tier client the dialog shows one Period Start / Period End row as before. For your multi-tier client, it should show a separate date row for each tier — confirm both rows appear, labelled and colour-coded.\n4. Set the Standard Monthly tier dates to cover the full month (e.g. 05/01/2026 – 05/31/2026).\n5. Set the Event / Daily tier dates to cover just the event weekend (e.g. 05/29/2026 – 05/31/2026).\n6. Click Generate and review the invoice — monthly units should show 1 period billed, daily event units should show 3 periods (days) billed with their own rate.\n7. Change the invoice status (e.g. Draft → Sent).",
         expected:"The Generate Invoice dialog shows one date row per tier for multi-tier clients. Each tier\'s units are billed at their own rate for their own date range. Monthly units show 1 period; daily event units show the correct number of days. The status change saves and reflects in the invoice list."},
       {id:"a7b", title:"Billing — apply a discount",
-        context:"A client negotiated a reduced rate for this invoice period and you need to apply a discount before sending.",
-        action:"1. Go to Billing (left nav) and open the invoice you created in the previous step (or any invoice in Draft or Sent status).\n2. Click 'Add Discount'. Enter a flat dollar amount (e.g. $25) and click Save. Confirm it appears as a line item on the invoice.\n3. Click 'Add Discount' again and switch the type to Percent, enter 10%, and save. Confirm the discount line updates to reflect the percentage.\n4. Now click the remove icon next to the discount line to delete it entirely. Confirm it disappears from the invoice.",
-        expected:"Each discount type (flat and percent) saves and appears as its own line item. Switching discount types replaces the previous one. Removing the discount clears it from the invoice completely."},
+        context:"A client negotiated a reduced rate and you need to apply a discount before sending.",
+        action:"1. Go to Billing (left nav) and open the invoice from the previous step (or any Draft or Sent invoice).
+2. Click 'Add Discount'. Enter a flat dollar amount (e.g. $25) and save. Confirm it appears as a line item.
+3. To switch to a percentage: remove the current discount first by clicking its remove icon. Then click 'Add Discount' again, switch the type to Percent, enter 10%, and save. Only one discount can be active at a time.
+4. Remove the discount and confirm it disappears.",
+        expected:"Discounts save and appear as a line item. Only one discount is active at a time — switching types requires removing the existing one first. Removing the discount clears it completely."},
       {id:"a7c", title:"Reports",
         context:"You want to review service activity and fleet status using the new Reports page. Note: reports only show data that exists in the system — if your account is new, some reports may have limited data.",
         action:"Go to Reports (Operations section of the left nav).\n\nRequired:\n1. Units Needing Service — click this report, then click Generate (no date range needed — it's a current snapshot). Review the table: units should be sorted by fill level, highest first. If any appear, check that the Client and Zone columns are populated. Export as PDF.\n2. Driver Activity — set a date range covering any days you or a driver have done scans during beta testing. Click Generate. Review the table and confirm actions, fill levels, and driver names look correct. Export as PDF and as CSV.\n\nOptional (run these if you have relevant data):\n3. Route Completion — set a date range covering the route you dispatched in A4. Generate and check Assigned vs. Completed counts.\n4. Fleet Service History — set a date range covering days where scans occurred. Generate and confirm only units that were actually serviced in that range appear.\n5. Client Invoice Summary — set a date range covering any billing period where invoices were generated. Confirm client totals look right.\n\nFor any report with data, also test Email: click the Email button, confirm it defaults to your email address, send, and check that a PDF arrives in your inbox.",
@@ -265,9 +272,11 @@ const TRACKS = {
         action:"Go to Users (left nav). Click '+ Invite User', enter a real email address you have access to, select the Operator role, and send the invite. Note: the system will send an actual email to that address — use your own email or a test address you can check.",
         expected:"The user is created and appears in the Users list. An invitation email arrives at the address you entered."},
       {id:"a9", title:"QR code management",
-        context:"You're running low on QR cards for new units.",
-        action:"1. Go to Admin (left nav) → QR Codes.\n2. Review the pool — note how many codes are available vs. reserved vs. used.\n3. Click 'Order QR Pack', choose a quantity, and submit the order.\n4. Check that the order appears in the fulfillment queue.",
-        expected:"The pool shows current code status clearly. The order is placed and appears in the queue with a pending status."},
+        context:"You want to review your QR code inventory and understand what happens when stock runs low.",
+        action:"1. Go to QR Codes (left nav).
+2. Review the pool — check how many codes are Reserved, Active, and Retired using the filter tabs.
+3. If a low inventory banner is showing (fewer than 20 reserved codes remaining), note what it says. QR code replenishment is handled by Solvalt, not ordered through the app — the banner will prompt you to contact Solvalt directly.",
+        expected:"The QR Codes page shows Reserved, Active, and Retired counts clearly. If inventory is low a warning banner appears with instructions to contact Solvalt. There is no self-service order button — replenishment is Solvalt-managed."},
       {id:"a10", title:"Settings & savings configuration",
         context:"Your real cost numbers are different from the defaults.",
         action:"1. Go to Settings (left nav, bottom). Scroll to the Savings Configuration section.\n2. Update one or more values — cost per mile, cost per stop, baseline miles per unit, or service fill threshold.\n3. Click Save, then navigate back to the Dashboard and check the savings widget.",
