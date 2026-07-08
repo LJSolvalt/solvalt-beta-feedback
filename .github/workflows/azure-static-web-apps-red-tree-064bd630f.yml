@@ -19,6 +19,12 @@ jobs:
         with:
           submodules: true
           lfs: false
+            - name: JS syntax check — validate inline script
+        run: |
+          node -e "const fs=require('fs'),h=fs.readFileSync('index.html','utf8'),m=h.match(/<script>([\s\S]*?)<\/script>/);if(!m){console.error('No script found');process.exit(1);}fs.writeFileSync('/tmp/beta_check.js',m[1]);"
+          node --check /tmp/beta_check.js
+          echo "✓ Beta app JS syntax check passed"
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -30,7 +36,25 @@ jobs:
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "/" # App source code path
           api_location: "" # Api source code path - optional
-          output_location: "" # Built app content directory - optional
+          output_location: ""
+      - name: Smoke test — verify app renders
+        run: |
+          echo "Waiting for CDN propagation..."
+          sleep 25
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" https://beta.solvaltinsights.com/)
+          if [ "$HTTP" != "200" ]; then
+            echo "✗ HTTP $HTTP — expected 200"
+            exit 1
+          fi
+          BODY=$(curl -s https://beta.solvaltinsights.com/)
+          if echo "$BODY" | grep -qi "solvalt"; then
+            echo "✓ Beta app render check passed"
+          else
+            echo "✗ Render check FAILED — response missing expected content"
+            echo "Response snippet: $(echo $BODY | head -c 500)"
+            exit 1
+          fi
+ # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
