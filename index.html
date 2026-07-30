@@ -985,9 +985,17 @@ function importFiles(files){
 }
 function fetchCoord(){
   const agg=document.getElementById("agg"); if(agg) agg.innerHTML=`<p class="muted">Loading…</p>`;
-  fetch(API_BASE.replace(/\/$/,"")+"/beta-feedback")
-    .then(r=>r.json()).then(d=>{COORD_DATA=Array.isArray(d)?d:(d.items||d.submissions||[]);renderAgg();})
-    .catch(()=>{const a=document.getElementById("agg");if(a)a.innerHTML=`<div class="banner">Couldn't reach the API. You can still import .json reports above.</div>`;});
+  /* The coordinator GET is gated on a Solvalt super-admin session. Sending the
+     cookie requires credentials:"include"; the API host already reflects this
+     origin with Allow-Credentials, so the cookie travels cross-site. You must be
+     logged in to the Solvalt app that API_BASE points at. Submitting feedback
+     (POST) stays open -- beta testers have no Solvalt accounts. */
+  fetch(API_BASE.replace(/\/$/,"")+"/beta-feedback",{credentials:"include"})
+    .then(r=>{ if(r.status===401||r.status===403) throw new Error("auth"); return r.json(); })
+    .then(d=>{COORD_DATA=Array.isArray(d)?d:(d.items||d.submissions||[]);renderAgg();})
+    .catch(e=>{const a=document.getElementById("agg");if(a)a.innerHTML=e&&e.message==="auth"
+      ? `<div class="banner">Sign in to Solvalt as a super admin to load submissions. You can still import .json reports above.</div>`
+      : `<div class="banner">Couldn't reach the API. You can still import .json reports above.</div>`;});
 }
 function renderAgg(){
   const agg=document.getElementById("agg"); if(!agg) return;
