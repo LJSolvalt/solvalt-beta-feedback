@@ -186,6 +186,10 @@ const APP_VERSION = "v0.9-beta";
    ============================================================ */
 const BETA_ACCOUNTS = [
   {
+    id:"cust_barnwellsanitation_beta", company:"Barnwell Sanitation", city:"Barnwell, SC", prefix:"BN", domain:"barnwellsanitation.com",
+    units:Array.from({length:25},(_,i)=>`BN-${String(i+1).padStart(3,"0")}`)
+  },
+  {
     id:"cust_tampa_001", company:"Suncoast Portable Solutions", city:"Tampa, FL", prefix:"TB", domain:"suncoastportable.com",
     units:Array.from({length:25},(_,i)=>`TB-${String(i+1).padStart(3,"0")}`)
   },
@@ -542,7 +546,7 @@ function renderAccount(){
       </div>
       <div style="margin-top:12px;background:var(--surface-3);border-radius:8px;padding:10px 12px">
         <p style="font-size:12px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px">Platform URL</p>
-        <p style="font-size:13px;color:var(--ink);margin:0;font-family:monospace"><a href="https://staging-full.solvaltinsights.com" style="color:var(--brand)">staging-full.solvaltinsights.com</a></p>
+        <p style="font-size:13px;color:var(--ink);margin:0;font-family:monospace"><a href="https://demo.solvaltinsights.com" style="color:var(--brand)">demo.solvaltinsights.com</a></p>
       </div>
       <div style="margin-top:8px;background:var(--surface-3);border-radius:8px;padding:10px 12px">
         <p style="font-size:12px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px">Unit IDs for your account</p>
@@ -588,7 +592,7 @@ function renderAccount(){
         </div>
         <div style="margin-top:8px;background:var(--surface-3);border-radius:8px;padding:10px 12px">
           <p style="font-size:12px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px">Platform URL</p>
-          <p style="font-size:13px;color:var(--ink);margin:0;font-family:monospace"><a href="https://staging-full.solvaltinsights.com" style="color:var(--brand)">staging-full.solvaltinsights.com</a></p>
+          <p style="font-size:13px;color:var(--ink);margin:0;font-family:monospace"><a href="https://demo.solvaltinsights.com" style="color:var(--brand)">demo.solvaltinsights.com</a></p>
         </div>
         <div style="margin-top:8px;background:var(--surface-3);border-radius:8px;padding:10px 12px">
           <p style="font-size:12px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px">Unit IDs for your account</p>
