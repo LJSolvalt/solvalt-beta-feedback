@@ -175,11 +175,18 @@
 /* ============================================================
    CONFIG
    ============================================================ */
-// When the Functions endpoint is live, set this to the API base, e.g.
-// "https://solvalt-insights-api-demo-d3b4ckezdff4hsar.eastus-01.azurewebsites.net/api"
-const API_BASE = "https://solvalt-insights-api-demo-d3b4ckezdff4hsar.eastus-01.azurewebsites.net/api";
+// Demo API. MUST stay on the solvaltinsights.com domain, not the
+// *.azurewebsites.net hostname, even though that hostname still serves.
+// This app is at beta.solvaltinsights.com and the coordinator GET sends the
+// session cookie. That cookie is issued by whichever host demo.solvaltinsights.com
+// calls -- which is now api-demo.solvaltinsights.com. Pointing at the old
+// azurewebsites.net hostname asks a DIFFERENT host for a cookie it never had,
+// so the coordinator dashboard 401s no matter how many times you sign in.
+// Staying on the domain also keeps this same-site, which is what lets the
+// cookie through now that solvalt_jwt is SameSite=Lax (Solvalt Insights v19.15).
+const API_BASE = "https://api-demo.solvaltinsights.com/api";
 const ALERT_TO = "louis.haynes@solvaltinc.com";
-const APP_VERSION = "v0.9-beta";
+const APP_VERSION = "v0.9.1-beta";
 
 /* ============================================================
    BETA ACCOUNTS
@@ -990,10 +997,13 @@ function importFiles(files){
 function fetchCoord(){
   const agg=document.getElementById("agg"); if(agg) agg.innerHTML=`<p class="muted">Loading…</p>`;
   /* The coordinator GET is gated on a Solvalt super-admin session. Sending the
-     cookie requires credentials:"include"; the API host already reflects this
-     origin with Allow-Credentials, so the cookie travels cross-site. You must be
-     logged in to the Solvalt app that API_BASE points at. Submitting feedback
-     (POST) stays open -- beta testers have no Solvalt accounts. */
+     cookie requires credentials:"include", and the API host reflects this origin
+     with Allow-Credentials. It is SAME-SITE, not cross-site: beta and api-demo
+     are both under solvaltinsights.com. That distinction now matters -- since
+     Solvalt Insights v19.15 the cookie is SameSite=Lax, and a genuinely
+     cross-site call would not carry it at all. You must be logged in to the
+     Solvalt app that API_BASE points at. Submitting feedback (POST) stays open
+     -- beta testers have no Solvalt accounts. */
   fetch(API_BASE.replace(/\/$/,"")+"/beta-feedback",{credentials:"include"})
     .then(r=>{ if(r.status===401||r.status===403) throw new Error("auth"); return r.json(); })
     .then(d=>{COORD_DATA=Array.isArray(d)?d:(d.items||d.submissions||[]);renderAgg();})
