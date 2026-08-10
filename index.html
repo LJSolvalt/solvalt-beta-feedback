@@ -186,12 +186,20 @@
 // cookie through now that solvalt_jwt is SameSite=Lax (Solvalt Insights v19.15).
 const API_BASE = "https://api-demo.solvaltinsights.com/api";
 const ALERT_TO = "louis.haynes@solvaltinc.com";
-const APP_VERSION = "v0.9.1-beta";
+const APP_VERSION = "v0.10-beta";
 
 /* ============================================================
    BETA ACCOUNTS
    ============================================================ */
-const BETA_ACCOUNTS = [
+/* v0.10-beta: this array is now a FALLBACK, not the source of truth.
+   Companies are fetched from GET /api/beta-companies/public at boot and this
+   list is replaced in place. It was previously the only list, which meant a
+   company created through the Solvalt admin tool did not exist as far as a
+   tester was concerned until someone hand-edited this file in a separate
+   repo -- testers were being onboarded into companies this app had never
+   heard of. Kept, rather than emptied, so a failed or slow fetch still leaves
+   a usable picker instead of a dead screen. */
+let BETA_ACCOUNTS = [
   {
     id:"cust_barnwellsanitation_beta", company:"Barnwell Sanitation", city:"Barnwell, SC", prefix:"BN", domain:"barnwellsanitation.com",
     units:Array.from({length:25},(_,i)=>`BN-${String(i+1).padStart(3,"0")}`)
@@ -1048,7 +1056,39 @@ function renderAgg(){
 /* ============================================================
    BOOT
    ============================================================ */
-render();
+
+/* v0.10-beta: pull the live company roster before first paint.
+   unit IDs are derived from unit_prefix + unit_count exactly the way the
+   fallback array builds them, so scenario placeholders ({{unit1}},
+   {{unit_offroute}}) resolve identically whichever source is in play.
+   {{unit_offroute}} is units[20], so any company with fewer than 21 units is
+   skipped rather than shown -- a picker entry that produces "undefined" in
+   scenario E3 is worse than one that is absent. */
+async function loadCompanies(){
+  try{
+    const r = await fetch(API_BASE + "/beta-companies/public", {cache:"no-store"});
+    if(!r.ok) return false;
+    const d = await r.json();
+    const list = (d && d.companies) || [];
+    const mapped = list
+      .filter(c => c.customer_id && c.company_name && c.unit_prefix && (c.unit_count||0) >= 21)
+      .map(c => ({
+        id: c.customer_id,
+        company: c.company_name,
+        city: c.city || "",
+        prefix: c.unit_prefix,
+        domain: c.domain || "",
+        units: Array.from({length: c.unit_count}, (_, i) =>
+          `${c.unit_prefix}-${String(i+1).padStart(3,"0")}`)
+      }));
+    if(mapped.length){ BETA_ACCOUNTS = mapped; return true; }
+  }catch(e){
+    /* offline, DNS, CORS, cold start -- fallback array stays in place */
+  }
+  return false;
+}
+
+loadCompanies().finally(() => render());
 </script>
 </body>
 </html>
