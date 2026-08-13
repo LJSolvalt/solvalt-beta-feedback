@@ -261,8 +261,8 @@ const TRACKS = {
         isPause:true},
       {id:"a5", title:"Live monitoring",
         context:"Your driver is out working the route you dispatched.",
-        action:"Go to Schedule (left nav). Find today's dispatched route and watch the stop progress indicators update as the driver completes stops.",
-        expected:"Stop progress updates automatically — you should not need to refresh the page."},
+        action:"Go to Schedule (left nav). Find today's dispatched route and check the completed stop count and progress bar. Refresh the page to pull the latest figures as the driver works through the stops.",
+        expected:"The completed stop count and progress bar reflect the driver's finished stops. The page does NOT poll — refresh to pull the latest progress."},
       {id:"a6", title:"Recall a route",
         context:"Plans changed and you need to pull a route back in.",
         action:"On the Schedule page, find the active dispatched route and click Recall. Confirm the recall. Then re-dispatch it to the same driver.",
@@ -337,7 +337,7 @@ const TRACKS = {
   },
   operator: {
     label: "Operator / Dispatcher", icon: "3",
-    blurb: "Office dispatcher — daily operations, routes, and the map. No billing or settings.",
+    blurb: "Office dispatcher — daily operations, routes, and the map. No billing, no client management, no settings.",
     scenarios: [
       {id:"o1", title:"Morning check-in",
         context:"You're starting your shift and reviewing what needs service today.",
@@ -351,10 +351,15 @@ const TRACKS = {
         context:"Your crew is ready to roll.",
         action:"Go to Schedule (left nav). Click '+ New Schedule'. If using a saved template select it from the dropdown — units will pre-populate. If picking manually, click zone headers to expand them and select units (or use the Needs Service button to grab all units at threshold). Assign a driver, set a start time, and click 'Create Schedule'. Find the schedule in the list and click 'Push to Driver' to dispatch it to the driver.",
         expected:"The schedule is created and appears in the list. After clicking Push to Driver, the status updates to Dispatched and the driver can see it on their Routes tab."},
+      {id:"o_pause", title:"⏸ A driver must work the route before Scenario 4",
+        context:"Progress on a route comes from a driver completing stops. It is NOT driven by the clock — a dispatched route stays at 'not started' until someone actually works it, however late in the day it gets.",
+        action:"If you are testing on your own: sign out, sign in with the DRIVER login for your company, open Routes, and complete two or three stops on the route you just dispatched. Then sign out and sign back in as the operator. If a real driver is working the route, you can skip this and go straight to Scenario 4.",
+        expected:"After the driver completes stops, return here and tap Next.",
+        isPause:true},
       {id:"o4", title:"Monitor active routes",
-        context:"A driver is out working.",
-        action:"Stay on the Schedule page and watch the live stop progress as stops get completed by the driver.",
-        expected:"Progress updates as each stop is completed — refresh the page to see the latest stop counts. The progress bar and completed stop count will update each time you refresh."},
+        context:"A driver has completed some stops on the route you dispatched.",
+        action:"Go to Schedule (left nav) and find today's dispatched route. Note the completed stop count and the progress bar. Refresh the page to pull the latest figures.",
+        expected:"The progress bar and completed stop count reflect the stops the driver finished. The page does NOT update on its own — you need to refresh to see new progress. A route nobody has started yet correctly reads 'not started'."},
       {id:"o5", title:"Map monitoring",
         context:"You want a visual read on the field.",
         action:"Go to Map (left nav). Check unit locations and review status coloring across the zones.",
@@ -366,11 +371,7 @@ const TRACKS = {
       {id:"o7", title:"Recall & reassign",
         context:"A driver just called out sick mid-day.",
         action:"On the Schedule page, find the active route and click Recall. Edit the driver assignment, then re-dispatch to a different driver.",
-        expected:"The recall works, the driver change saves, and the new driver receives the route."},
-      {id:"o8", title:"Client context & unit assignment",
-        context:"You need to set up clients, assign units to them, then move a unit between clients.",
-        action:"1. Go to Clients (left nav). Click '+ New Client', fill in name and contact info, add at least one rate tier, and save.\n2. Once created, click 'Assign Units' on the client card. Select 3-5 available units and confirm.\n3. Create a second client the same way and assign a few different units to it.\n4. Now reassign one unit from the first client to the second — use the Assign Units panel to move it.",
-        expected:"Both clients appear in the list with their assigned units shown. The reassigned unit disappears from the first client and appears under the second immediately."}
+        expected:"The recall works, the driver change saves, and the new driver receives the route."}
     ]
   },
   edge: {
