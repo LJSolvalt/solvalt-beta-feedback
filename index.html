@@ -186,7 +186,7 @@
 // cookie through now that solvalt_jwt is SameSite=Lax (Solvalt Insights v19.15).
 const API_BASE = "https://api-demo.solvaltinsights.com/api";
 const ALERT_TO = "louis.haynes@solvaltinc.com";
-const APP_VERSION = "v0.10-beta";
+const APP_VERSION = "v0.11-beta";
 
 /* ============================================================
    BETA ACCOUNTS
@@ -290,7 +290,11 @@ const TRACKS = {
       {id:"a10", title:"Settings & savings configuration",
         context:"Your real cost numbers are different from the defaults.",
         action:"1. Go to Settings (left nav, bottom). Scroll to the Savings Configuration section.\n2. Update one or more values — cost per mile, cost per stop, baseline miles per unit, or service fill threshold.\n3. Click Save, then navigate back to the Dashboard and check the savings widget.",
-        expected:"The savings figure on the Dashboard changes to reflect your updated constants."}
+        expected:"The savings figure on the Dashboard changes to reflect your updated constants."},
+      {id:"a11", title:"Operator Access - granting and revoking",
+        context:"Your dispatcher needs to cover invoicing while you are away, but you do not want to make them an administrator. Settings has three switches that hand operators specific jobs without changing anyone's role.",
+        action:"1. Go to Settings (left nav, bottom) and find the Operator Access section. There are three switches - Client management, Unit assignment, and Invoicing - and all three start OFF.\n2. Turn ON Invoicing only. Sign out and sign in with your OPERATOR login (operator@ your company domain, same password). Billing should now be in the left nav and should open.\n3. Sign back in as admin. Turn Invoicing OFF and turn ON Client management only. As the operator again: Billing should be gone from the nav, and the Clients page should now show Add Client, plus Edit and Archive on each row.\n4. Sign back in as admin and turn ON Unit assignment as well. As the operator, open the assign-units panel on a client (the arrow on the client row) and confirm the checkboxes and tier dropdowns are now active.\n5. Last part, and the one we most want checked. Leave the operator signed in on one device or browser. On another, sign in as admin and turn ALL THREE switches off. Back on the operator side, WITHOUT signing out, navigate to Clients and try to add or edit a client.\n6. Tell us what you saw at step 5 - specifically whether the operator was still able to make a change after you turned the switches off.",
+        expected:"Each switch adds exactly the thing it names and nothing else - Invoicing brings Billing into the nav, Client management adds Add/Edit/Archive on Clients, Unit assignment activates the checkboxes in the assign-units panel. Turning a switch off takes effect on the operator's very next action, without them signing out and back in. At no point does the operator gain Users, QR Codes inventory, or the company sections of Settings."}
     ]
   },
   driver: {
@@ -337,7 +341,7 @@ const TRACKS = {
   },
   operator: {
     label: "Operator / Dispatcher", icon: "3",
-    blurb: "Office dispatcher — daily operations, routes, and the map. Clients are read-only; no billing, no settings.",
+    blurb: "Office dispatcher — daily operations, routes, and the map. Clients are read-only and there is no billing, unless your admin has switched those on for operators.",
     scenarios: [
       {id:"o1", title:"Morning check-in",
         context:"You're starting your shift and reviewing what needs service today.",
@@ -371,7 +375,11 @@ const TRACKS = {
       {id:"o7", title:"Recall & reassign",
         context:"A driver just called out sick mid-day.",
         action:"On the Schedule page, find the active route and click Recall. Edit the driver assignment, then re-dispatch to a different driver.",
-        expected:"The recall works, the driver change saves, and the new driver receives the route."}
+        expected:"The recall works, the driver change saves, and the new driver receives the route."},
+      {id:"o8", title:"What you can reach by default",
+        context:"An operator starts with a fixed set of pages. Anything beyond that is something your admin deliberately turns on for the whole company, and it can be turned back off at any time. This scenario checks the starting point is what it should be.",
+        action:"1. Look at the left nav. Unless your admin has told you otherwise, there should be no Billing entry.\n2. Go to Clients. You should see the full client list, contact details, rate tiers and assigned units - but no Add Client button, and no Edit or Archive on the rows. There should be a small 'read-only' note next to the client count.\n3. Open the assign-units panel on a client using the arrow at the end of the row. The units and tiers should be visible but the checkboxes and dropdowns should be inactive.\n4. Type your company portal address into the browser bar followed by /billing and press enter. You should land back on the Dashboard rather than on a billing page.\n5. If any of the above is NOT what you saw, say so - either your admin has switched something on for operators, which is fine and worth noting, or something is wrong.",
+        expected:"No Billing in the nav, Clients is visibly read-only with the note shown, the assign-units controls are inactive, and typing the billing address directly returns you to the Dashboard instead of showing invoices."}
     ]
   },
   edge: {
